@@ -70,11 +70,13 @@ BLAS 是 Basic Linear Algebra Subprograms 的缩写，本手册只要求将其�
 
 #### Linux 光盘映像文件
 
-本手册所使用的范例发行版是 Debian 10，同学可根据自己的喜好和经验挑选适合的发行版。
+本手册所使用的范例发行版是 Debian 11，同学可根据自己的喜好和经验挑选适合的发行版。
 Debian 下载点（如果网速问题可访问国内镜像）：
 
-- [Official Mirror](https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/)
+
+- [ZJU Mirror](https://mirrors.zju.edu.cn/debian-cd/current-live/amd64/iso-hybrid/)
 - [Tuna Mirror](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/current-live/amd64/iso-hybrid/)
+- [Official Mirror](https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/)
 
 ![Debian 下载](pics/02.png)
 
