@@ -7,3 +7,15 @@ nav:
   - Lab3-Cuda: Lab3-Cuda/index.md
   - Lab4-Gemm: Lab4-Gemm/index.md
   - Lab5-ML: Lab5-ML/index.md
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
