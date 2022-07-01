@@ -1,7 +1,7 @@
 # 实验五：深度神经网络训练与加速
 
-
 ## 1 实验简介
+
 **深度学习**（Deep Learning）是[机器学习](https://zh.wikipedia.org/wiki/机器学习)的分支，是一种以[人工神经网络](https://zh.wikipedia.org/wiki/人工神经网络)为架构，对资料进行表征学习的[算法](https://zh.wikipedia.org/wiki/算法)。深度学习能够取得如此卓越的成就，除了优越的算法、充足的数据，更离不开强劲的算力。近年来，深度学习相关的基础设施逐渐成熟，从网络设计时的训练、优化，到落地的推理加速，都有非常优秀的解决方案。其中，对于算力的需求最大的部分之一是网络的训练，它也因此成为 HPC 领域经常研究的话题。
 
 **卷积神经网络**（Convolutional Neural Network, **CNN**）是一种[前馈神经网络](https://zh.wikipedia.org/wiki/前馈神经网络)，对于大型图像处理有出色表现。
@@ -12,13 +12,9 @@
 
 > 考虑到部分同学此前对于深度学习并没有很多了解，本次实验的 LeNet-5 部分主要目的为引导大家熟悉深度学习的流程，因此只需要完成即可得到分数，而 GPT 部分主要目的是引导大家尝试对于大型网络的训练进行优化，因此我们会根据实现的模型规模和加速情况进行给分。
 
-
-
 ## 2 实验环境
 
 请大家在我们提供的集群上创建一个开发环境为 PyTorch 的容器（要求最后在实验报告中展示环境基本信息）。容器中含有 Nvidia GeForce RTX 2080 Ti 及 PyTorch，无需自行配置。
-
-
 
 ## 3 实验基础知识介绍
 
@@ -62,7 +58,7 @@ MNIST 数据集 (Mixed National Institute of Standards and Technology database) 
 
 <img src="index.assets/MNIST.jpeg" alt="How to Train a Model with MNIST dataset | by Abdullah Furkan Özbek | Medium" style="zoom:50%;" />
 
-MNIST 数据集下载： http://yann.lecun.com/exdb/mnist/index.html 
+MNIST 数据集下载： http://yann.lecun.com/exdb/mnist/index.html
 
 #### 3.2.2 Web of Science 数据集
 
@@ -88,8 +84,10 @@ Web of Science 是一个付费的文献元数据库，通过校网可以免费�
 # MNIST
 torchvision.datasets.MNIST(root, train=True, transform=None, target_transform=None, download=False)
 ```
+
 一些重要的参数说明：
- - root: 在`MNIST`中是 `processed/training.pt` 和 `processed/test.pt` 的主目录
+
+- root: 在 `MNIST`中是 `processed/training.pt` 和 `processed/test.pt` 的主目录
 - train: `True` 代表训练集，`False` 代表测试集
 - transform 和 target_transform: 分别是对图像和 label 的转换操作
 - download: 若为 `True` 则下载数据集并放到 `root` 所指定的目录中，否则直接尝试从 `root` 目录中读取
@@ -99,9 +97,11 @@ torchvision.datasets.MNIST(root, train=True, transform=None, target_transform=No
 #### 4.1.2 模型编写
 
 ##### 4.1.2.1 网络结构
+
 `PyTorch` 提供了许多种定义模型的方式，最常用的一种是将网络结构以类保存，你应当首先继承 [torch.nn.Module](https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module)，并实现正向传播的 `forward` 函数，(为什么不用定义反向传播函数呢？因为你继承的 `nn.Module` 就是干这个事情的)。
 
 下面为网络结构的一个 sample（但显然这样的网络并不能用于本次 Lab），本次实验中你需要自定义你的网络结构，以完成我们的分类任务：
+
 ```Python
 import torch.nn as nn
 import torch.nn.functional as F
@@ -118,22 +118,27 @@ class Model(nn.Module):
 ```
 
 当然，你需要实例化你的模型，可以直接对模型打印以查看结构
+
 ```Python
 model = Model()
 print(model)
 ```
+
 网络结构编写中一个很大的难点在于每一步的 tensor shape 需要匹配，请仔细检查你的代码来确保此部分的正确性。
 
 ##### 4.1.2.2 损失函数
 
-常见的损失函数都被定义在了`torch.nn`中，你可以在训练过程开始前将其实例化，并在训练时调用，例如：
+常见的损失函数都被定义在了 `torch.nn`中，你可以在训练过程开始前将其实例化，并在训练时调用，例如：
+
 ```Python
 criterion = torch.nn.CrossEntropyLoss()
 ```
 
 ##### 4.1.2.3 正向传播
+
 正向传播是指对神经网络沿着从输入层到输出层的顺序，依次计算并存储模型的中间变量（包括输出）。
-正向传播的过程在`forward`中定义，对于模型实例，可以直接利用输入输出得到模型预测的结果。
+正向传播的过程在 `forward`中定义，对于模型实例，可以直接利用输入输出得到模型预测的结果。
+
 ```Python
 y_pred = model(x)
 ```
@@ -147,15 +152,20 @@ y_pred = model(x)
 ##### 4.1.2.5 优化器
 
 常用的优化器都被定义在了 `torch.optim` 中，为了使用优化器，你需要构建一个 optimizer 对象。这个对象能够保持当前参数状态并基于计算得到的梯度进行参数更新。你需要给它一个包含了需要优化的参数（必须都是 Variable 对象）的iterable。然后，你可以设置optimizer的参数选项，比如学习率，权重衰减，例如：
+
 ```Python
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 optimizer = optim.Adam([var1, var2], lr=0.0001)
 ```
+
 所有的optimizer都实现了step()方法，这个方法会更新所有的参数。或许你会在反向传播后用到它。
+
 ```Python
 optimizer.step()
 ```
+
 需要注意的是，在反向传播前，如果你不希望梯度累加，请使用下面的代码将梯度清零。
+
 ```Python
 optimizer.zero_grad()
 ```
@@ -163,6 +173,7 @@ optimizer.zero_grad()
 #### 4.1.3 训练过程
 
 前文中已经定义了网络结构、损失函数、优化器，至此，一个较为完整的训练过程如下，需要注意的是，你的训练过程要不断从 `DataLoader` 中取出数据。
+
 ```Python
 criterion = torch.nn.MSELoss(reduction='sum')
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-8, momentum=0.9)
@@ -183,17 +194,19 @@ for t in range(30000):
 
 TensorBoard 是常用的训练过程可视化工具。请参考 [PyTorch](https://pytorch.org/tutorials/recipes/recipes/tensorboard_with_pytorch.html) 的官方教程完成配置。
 
-
 #### 4.1.5 Tips
+
 - `nn.functional.ReLU`  （简记为 `F.ReLU` ）和 `nn.ReLU` 略有不同，区别在于前者作为一个函数调用，如 4.3.1 中所示，而后者作为一个层结构，必须添加到 `nn.Module` 容器中才能使用，两者实现的功能一样，在 `PyTorch` 中，`nn.X` 都有对应的函数版本 `F.X`。
-- 除了利用继承 `nn.Module` 来建立网络，不推荐但可以使用 `nn.ModuleList`, `nn.ModuleDict`，推荐使用`nn.Sequential`直接定义模型
+- 除了利用继承 `nn.Module` 来建立网络，不推荐但可以使用 `nn.ModuleList`, `nn.ModuleDict`，推荐使用 `nn.Sequential`直接定义模型
 - 你可以定义如下的 `device` 变量，以便你的模型在没有 GPU 环境下也可以测试：
+
 ```Python
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model = Model().to(device)
 some_data = some_data.to(device)
 ```
+
 - 相比于原生的 `PyTorch`，`PyTorch Lightning` 框架对其进行了更高层次的封装，很大程度上简化了模型定义、训练以及测试的步骤，使用 `PyTorch Lightning` 作为本次实验的加分项，官网链接已附在参考资料中。如果你能够在 TensorBoard 中将中间层可视化，你能得到更多的加分。
 
 ### 4.2 GPT 训练与加速
@@ -206,7 +219,7 @@ some_data = some_data.to(device)
 
 常用的分词算法有字节对编码（Byte-Pair Encoding, **BPE**）、WordPiece、Unigram、SentencePiece 等，其中 GPT 用的是 BPE。BPE 从单个字母的词表开始，通过不断合并高频字母对，直到达到预定的词表大小。WordPiece 与 BPE 基本相同，合并策略有所区别。
 
-具体原理介绍可参考 <https://huggingface.co/docs/transformers/tokenizer_summary>，[中文介绍](https://cloud.tencent.com/developer/article/1865689)。
+具体原理介绍可参考 [https://huggingface.co/docs/transformers/tokenizer_summary](https://huggingface.co/docs/transformers/tokenizer_summary)，[中文介绍](https://cloud.tencent.com/developer/article/1865689)。
 
 可以直接使用[huggingface 的预训练分词器](https://huggingface.co/docs/transformers/preprocessing)，如选择自己训练可以加分（
 
@@ -216,32 +229,36 @@ some_data = some_data.to(device)
 
 #### 4.2.3 多卡训练
 
-TODO: 4
+单张GPU的显存和算力是有限的，随着模型大小的增长，我们需要多张GPU一起参与训练以获得更大的显存和更高的算力。多卡训练Transformer模型时常见的并行策略有**张量并行（Tensor Parallelism）**、**流水线并行（Pipeline Parallelism）**和**数据并行（Data Parallelism）**。
+
+* 张量并行将模型层内的参数切分到不同设备进行计算,在Transformer中，注意和多层感知器(MLP)的张量在向前和向后计算时按行或列分割。
+  ![](index.assets/Tensor-Parallelism.png)
+* 流水线并行将模型不同的层切分到不同设备进行计算，流水线中的每一设备接受上一节点的结果，并把自己的结果传递给下一设备。
+  ![](index.assets/Pipeline-Parallelism.png)
+* 数据并行则将全局批次大小（global batch size）按照流水线分组进行分割，每个流水线组都包含模型的一个副本，数据在组内按照局部批次规模送入模型副本，最后将各组得到的梯度进行加权平均得到总的梯度。
+  ![](index.assets/Data-Parallelism.png)
+
+在pytorch、tensorflow等框架中都存在分布式训练的模块，为了减轻工作量，此部分也允许使用huggingface accelerate等模型库，以及其他的分布式训练加速框架。
 
 #### 4.2.4 模型评分规模
 
-TODO: 5
-
 1. 评分规模一
-
-单卡的最大规模，各种参数列一个表
-
+   | Model | Hidden  size | Attention- heads | Layers | Parameters (Million) | Sequence length |
+   | :---: | :----------: | :--------------: | :----: | :------------------: | :-------------: |
+   | 307M |     1024     |        16        |   20   |         307         |      1024      |
 2. 评分规模二
-
-双卡 naive 实现下的最大规模
-
 3. 评分规模三
-
+   | Model | Hidden  size | Attention- heads | Layers | Parameters (Million) | Sequence length |
+   | :---: | :----------: | :--------------: | :----: | :------------------: | :-------------: |
+   | 566M |     1536     |        16        |   20   |         566         |      1024      |
 4. 评分规模四
-
 
 ## 5 实验任务与要求
 
 1. 使用 `PyTorch` 实现最基本的卷积神经网络 LeNet-5，并在 MNIST 数据集上使用 GPU 进行训练，并对测试集进行测试。
-
 2. 使用 `PyTorch` 及相关模型库实现类 GPT 网络，在 Web of Science 数据集上进行训练，并尝试对模型训练进行加速。
-
 3. 你需要提交：
+
    1. 全部代码
    2. 实验报告，其中需要包含：
       1. 简要实验过程
@@ -249,21 +266,13 @@ TODO: 5
       3. Tensorboard **两个模型的损失曲线、LeNet-5 的准确率曲线等截图**
       4. 对于 LeNet-5，你需要写明测试集上的**识别正确率**
       5. 对于 GPT，你需要写明每一个评分模型规模下训练完成的时间，以及最后的收敛情况（loss < 7 视为成功训练）
-
 4. ***LeNet-5 部分不允许直接使用各种深度学习开发工具已训练好的 CNN 网络结构与参数。***
-
 5. ***本次实验依然会进行查重，如果你参考了网络上的代码请在报告中列出，并体现出你的理解，否则一经查出视为抄袭***
-
-
 
 ## 参考资料
 
 - `PyTorch` 框架 https://pytorch.org/
-
 - `PyTorch Lightning` 框架 https://www.pytorchlightning.ai/
-
 - MNIST 数据集 http://yann.lecun.com/exdb/mnist/index.html
-
 - LeNet-5 网络结构 http://yann.lecun.com/exdb/lenet/
-
 - GPT 网络介绍 https://en.wikipedia.org/wiki/GPT-2
