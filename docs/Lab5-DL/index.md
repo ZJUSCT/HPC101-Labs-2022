@@ -242,25 +242,25 @@ some_data = some_data.to(device)
 
 对于以下的每个规模，你需要按照表格中给定的模型结构参数实现模型，并按照要求的 token 数量对模型进行训练。规定 token 数量训练结束后，若模型损失低于 7，认为模型训练成功，此时训练速度越快该测试点得分越高；否则认为模型训练失败，该测试点记零分。
 
-1. 评分规模一
+- 评分规模一
 
 | Model size | Hidden size | Attention-heads | Layers | Sequence length | Tokens |
 | :---: | :----------: | :--------------: | :----: | :-------------: | :-------------: |
 | 117M |     768     |        12        |   12   |      1024      |      16M      |
 
-2. 评分规模二
+- 评分规模二
 
 | Model size | Hidden size | Attention-heads | Layers | Sequence length |Tokens |
 | :---: | :----------: | :--------------: | :----: | :-------------: |:-------------: |
 | 307M |     1024     |        16        |   20   |      1024      |16M      |
 
-3. 评分规模三
+- 评分规模三
 
 | Model size | Hidden size | Attention-heads | Layers | Sequence length |Tokens |
 | :---: | :----------: | :--------------: | :----: | :-------------: |:-------------: |
 | 566M |     1536     |        16        |   20   |      1024      |16M      |
 
-4. 评分规模四
+- 评分规模四
 
 | Model size | Hidden size | Attention-heads | Layers | Sequence length |Tokens |
 | :---: | :----------: | :--------------: | :----: | :-------------: |:-------------: |
