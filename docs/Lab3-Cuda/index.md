@@ -37,17 +37,17 @@
 
 ### 一维离散卷积
 
-定义 $$\left(f*g\right)\left(n\right)$$ 为函数 $$f$$ 与 $$g$$ 的卷积
+定义 $\left(f*g\right)\left(n\right)$ 为函数  $f$ 与  $g$ 的卷积
 
 $$
 \left(f*g\right)\left(n\right)=\Sigma_{t=-\infty}^{+\infty}f\left(t\right)g\left(n-t\right)
 $$
 
-函数 $$f$$ 和 $$g$$ 定义域可以不是所有整数，修改上式中 $$t$$ 的遍历范围可得到新的定义；另一种方式是定义超出定义域的函数值视为 0 ，可得到相同的结果。
+函数 $f$ 和 $g$ 定义域可以不是所有整数，修改上式中 $t$ 的遍历范围可得到新的定义；另一种方式是定义超出定义域的函数值视为 0 ，可得到相同的结果。
 
 需要注意的是，两个函数的卷积结果仍是函数。
 
-可以形象地理解为沿着不断移动的 $$x+y=n$$ 直线，将两个函数卷成一个新的函数，每条直线对应新函数的一组对应关系。
+可以形象地理解为沿着不断移动的 $x+y=n$ 直线，将两个函数卷成一个新的函数，每条直线对应新函数的一组对应关系。
 
 ### 二维离散卷积
 
@@ -59,14 +59,13 @@ $$
 
 我们在实验中的定义卷积与数学上的定义存在差别，我们认为其在广义上属于二维离散卷积。
 
-简化起见，考虑两个方阵 $$f$$ 和 $$g$$，$$f$$ 的大小为 $$a*a$$，$$g$$ 的大小为 $$b*b$$，我们将 $$g$$ 称为核（kernel）函数，且要求 $$b$$ 为奇数。$$f$$ 行列下标均从 0 开始，
-$$g$$ 的行列下标则从 $$-\lfloor b/2\rfloor$$ 到 $$+\lfloor b/2\rfloor$$ （包括0） ，此时卷积的结果可以定义为: 
-
+简化起见，考虑两个方阵 $f$ 和 $g$，$f$ 的大小为 $a*a$，$g$ 的大小为 $b*b$，我们将 $g$ 称为核（kernel）函数，且要求 $b$ 为奇数。$f$ 行列下标均从 0 开始，
+$g$ 的行列下标则从 $-\lfloor b/2\rfloor$ 到 $+\lfloor b/2\rfloor$ （包括0） ，此时卷积的结果可以定义为: 
 $$
 \left(f*g\right)\left(n,m\right)=\Sigma_{i=-\lfloor b/2\rfloor}^{+\lfloor b/2\rfloor}\Sigma_{j=-\lfloor b/2\rfloor}^{+\lfloor b/2\rfloor}f\left(n+i,m+j\right)g\left(i,j\right)
 $$
 
-若 $$f$$ 的下标范围超出定义范围，本实验的方式是填充一个默认值 (0) 以解决问题，卷积结果与$$f$$大小相同。
+若 $f$ 的下标范围超出定义范围，本实验的方式是填充一个默认值 (0) 以解决问题，卷积结果与$f$大小相同。
 
 ## Bank
 
@@ -176,12 +175,12 @@ __global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a,
 
 Tensor Core能在一个周期内完成一个小矩阵乘法，因而提高计算效率，但是Tensor Core对作矩阵乘法的两个矩阵的形状要求比较高(例如4x4x4，8x8x8等)，你需要合理地对矩阵进行切分和对Wrap中的线程合理分配来发挥出Tensor Core的计算性能。了解如何调用Tensor Core，可以查阅文档尾部的参考文献。
 
-使用Tensor Core完成本次lab，你将会获得Bonus
+使用Tensor Core完成本次lab，你将会获得Bonus。
 
 
 ## 实验初始代码
 
-详见 [starter_code](https://github.com/ZJUSCT/HPC101-Labs-2022/blob/main/docs/Lab2-Cuda/starter_code)
+详见 [starter_code](https://github.com/ZJUSCT/HPC101-Labs-2022/tree/main/docs/Lab3-Cuda/starter_code)。
 
 ## 实验任务与要求
 
@@ -193,7 +192,7 @@ Tensor Core能在一个周期内完成一个小矩阵乘法，因而提高计算
 
 **若对不允许修改部分代码正确性有疑问请联系助教**
 
-本实验的目的是让大家学习实践课程教授的 CUDA 优化知识，熟悉 GPU 编程与优化，掌握面对常见并行问题的调试技巧。
+本实验的目的是让大家学习实践课程教授的 CUDA 优化知识，熟悉 GPU 编程与优化，掌握面对常见并行问题的调试技巧。**不允许使用cuDNN等算子库或者使用第三方工具自动生成的代码**。
 
 > **Note**: 调试时为使错误可复现，可以将代码中的 `std::default_random_engine generator(r());` 改为 `std::default_random_engine generator;`，这样每次生成的随机矩阵都会是一致的。
 
