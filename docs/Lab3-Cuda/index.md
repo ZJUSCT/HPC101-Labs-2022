@@ -106,8 +106,13 @@ MEM[8]    MEM[9]    MEM[10]   MEM[11]
 - Kernel: `KH x KW x CI x CO`
 - Output: `N x H x W x CO`
 
-
 二维卷积计算的 CPU 版本已在 `conv_test.cu` 中的`conv2d_cpu_kernel`给出，用以验证正确性。即通过批、输入通道、输出通道、卷积核高、卷积核宽的五层循环轮流计算结果矩阵中每个位置的值。其中做了padding的0填充等处理。
+
+> **注意：**由于正确性验证中用到了OpenMP，它自动检测到的CPU核心数并不正确，可能会远超出aistation实际分配能调用的核心数，导致速度异常缓慢。因此，你需要设置环境变量：
+>
+> ```shell
+> export OMP_NUM_THREADS=4
+> ```
 
 基准代码为程序中的`conv2d_cuda_kernel`核函数，是未经优化的五层循环嵌套GPU实现，你可以在此基础上进行改进，亦或者重新自己实现。
 
