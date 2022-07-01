@@ -4,7 +4,7 @@
 #include <iostream>
 #include <random>
 
-const int alignment = 32; // 32 btye alignment
+const int alignment = 32; // 32 byte alignment
 const int size = 100;
 const int kernel = 3;  // odd
 const int batch_size = 128;
@@ -20,7 +20,7 @@ const int out_channel = 128;
 #define w(_x, _y, _ci, _co) w[(_x) * kernel * in_channel * out_channel + (_y) * in_channel * out_channel + (_ci) * out_channel + (_co)]
 #define b(_n, _x, _y, _c) b[(_n) * size * size * out_channel + (_x) * size * out_channel + (_y) * out_channel + (_c)]
 
-/// \brief Gerenate [N, H, W, C] input tensor and [H, W, I, O] kernel tensor.
+/// \brief Generate [N, H, W, C] input tensor and [H, W, I, O] kernel tensor.
 void Generate(uint8_t *const a, uint8_t *const w) {
 #pragma omp parallel for
   // Batch dimension.
