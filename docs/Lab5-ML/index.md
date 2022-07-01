@@ -2,7 +2,7 @@
 
 ## 1 实验简介
 
-**深度学习**（Deep Learning）是[机器学习](https://zh.wikipedia.org/wiki/机器学习)的分支，是一种以[人工神经网络](https://zh.wikipedia.org/wiki/人工神经网络)为架构，对资料进行表征学习的[算法](https://zh.wikipedia.org/wiki/算法)。深度学习能够取得如此卓越的成就，除了优越的算法、充足的数据，更离不开强劲的算力。近年来，深度学习相关的基础设施逐渐成熟，从网络设计时的训练、优化，到落地的推理加速，都有非常优秀的解决方案。其中，对于算力的需求最大的部分之一是网络的训练，它也因此成为 HPC 领域经常研究的话题。
+**深度学习**（Deep Learning）是[机器学习](https://zh.wikipedia.org/wiki/机器学习)的分支，是一种以[人工神经网络](https://zh.wikipedia.org/wiki/人工神经网络)为架构，对数据进行表征学习的[算法](https://zh.wikipedia.org/wiki/算法)。深度学习能够取得如此卓越的成就，除了优越的算法、充足的数据，更离不开强劲的算力。近年来，深度学习相关的基础设施逐渐成熟，从网络设计时的训练、优化，到落地的推理加速，都有非常优秀的解决方案。其中，对于算力的需求最大的部分之一是网络的训练过程，它也因此成为 HPC 领域经常研究的话题。
 
 **卷积神经网络**（Convolutional Neural Network, **CNN**）是一种[前馈神经网络](https://zh.wikipedia.org/wiki/前馈神经网络)，对于大型图像处理有出色表现。
 
@@ -34,9 +34,7 @@ LeNet-5是一个较简单的卷积神经网络。下图显示了其结构：输�
 
 #### 3.1.3 GPT
 
-> ~~这里介绍的不是 GUID Partition Table~~
-
-在自然语言处理（natural language processing, NLP）中，早期使用的是循环神经网络（Recurrent Neural Network, **RNN**）。RNN 与 CNN 这样的前馈网络不同，RNN 中存在反馈和隐藏单元，使它可以「记住」之前读到的内容。为了解决深层网络中梯度消失或爆炸的问题，引入了长短期记忆（Long short-term memory, **LSTM**）。而为了解决传统 RNN 只能记住前面的问题，提出了双向的 LSTM。在此基础上引入的注意力机制（attention），使得网络能注意句子中重要位置的信息，例如允许在翻译中可以改变词语的顺序。
+在自然语言处理（Natural language processing, NLP）中，早期使用的是循环神经网络（Recurrent Neural Network, **RNN**）。RNN 与 CNN 这样的前馈网络不同，RNN 中存在反馈和隐藏单元，使它可以「记住」之前读到的内容。为了解决深层网络中梯度消失或爆炸的问题，引入了长短期记忆（Long short-term memory, **LSTM**）。而为了解决传统 RNN 只能记住前面的问题，提出了双向的 LSTM。在此基础上引入的注意力机制（attention），使得网络能注意句子中重要位置的信息，例如允许在翻译中可以改变词语的顺序。
 
 不久后，研究者发现只靠注意力机制而无需 RNN 或 CNN，就能达到较好的效果，这就是 Transformer 模型。与 RNN 不同的是，Transformer 模型能够一次性处理所有输入数据。注意力机制可以为输入序列中的任意位置提供上下文。这种架构允许更高的并行度，并以此减少训练时间。
 
@@ -44,7 +42,7 @@ LeNet-5是一个较简单的卷积神经网络。下图显示了其结构：输�
 
 ![](index.assets/transformer.png)
 
-Transformer 的详细结构和原理较为复杂，可参考[原论文](https://arxiv.org/abs/1706.03762)。
+Transformer 的详细结构可参考[原论文](https://arxiv.org/abs/1706.03762)。
 
 2018 年，OpenAI 提出了生成预训练 Transformer 模型（Generative Pre-trained Transformer, **GPT**）。与先前基于监督式学习的 NLP 模型不同，GPT 在预训练生成阶段是无监督的（不需要标注），只在需要适应特定任务的**微调**（fine-tuning）时需要监督，降低了大规模 NLP 模型的门槛。GPT 的结构是 12 层仅包含解码器的 Transformer。一年后的 GPT-2 是对 GPT 的直接放大，参数量和数据集都增加了一个量级，参数量达到了 15 亿，取得了更好的效果和迁移学习能力。下一代的 GPT-3 达到了 1750 亿参数，生成的文章已经很难与人类写的区分出来。在一些领域，GPT-3 也**不再需要**专门的微调，而只需要提供例子等文本交互即可完成任务。大家可能熟悉的 GitHub Copilot 也是 GPT 的一个主要应用。
 
@@ -58,7 +56,7 @@ MNIST 数据集 (Mixed National Institute of Standards and Technology database) 
 
 <img src="index.assets/MNIST.jpeg" alt="How to Train a Model with MNIST dataset | by Abdullah Furkan Özbek | Medium" style="zoom:50%;" />
 
-MNIST 数据集下载： http://yann.lecun.com/exdb/mnist/index.html
+MNIST 数据集下载：http://yann.lecun.com/exdb/mnist/index.html
 
 #### 3.2.2 Web of Science 数据集
 
@@ -219,13 +217,13 @@ some_data = some_data.to(device)
 
 常用的分词算法有字节对编码（Byte-Pair Encoding, **BPE**）、WordPiece、Unigram、SentencePiece 等，其中 GPT 用的是 BPE。BPE 从单个字母的词表开始，通过不断合并高频字母对，直到达到预定的词表大小。WordPiece 与 BPE 基本相同，合并策略有所区别。
 
-具体原理介绍可参考 [https://huggingface.co/docs/transformers/tokenizer_summary](https://huggingface.co/docs/transformers/tokenizer_summary)，[中文介绍](https://cloud.tencent.com/developer/article/1865689)。
+具体原理介绍可参考 [https://huggingface.co/docs/transformers/tokenizer_summary](https://huggingface.co/docs/transformers/tokenizer_summary)，以及 [NLP BERT GPT等模型中 tokenizer 类别说明详解](https://cloud.tencent.com/developer/article/1865689)。
 
-可以直接使用[huggingface 的预训练分词器](https://huggingface.co/docs/transformers/preprocessing)，如选择自己训练可以加分（
+可以直接使用 [huggingface 的预训练分词器](https://huggingface.co/docs/transformers/preprocessing)中提供的 GPT-2 tokenizer，如选择自己训练 vocab 可以获得 bonus。
 
 #### 4.2.2 基准代码构建与加速
 
-请参考 3.1.3 中的模型结构描述完成基准代码的构建，并基于此进行训练加速。为了减轻工作量，此部分允许使用huggingface transformer等模型库，以及其他的分布式训练加速框架。但需要在报告里陈述你所采用的各项优化的原理、出发点和效果。
+请参考 3.1.3 中的模型结构描述完成基准代码的构建，并基于此进行训练加速。为了减轻工作量，此部分允许使用 huggingface transformer 等模型库，以及其他的分布式训练加速框架。但需要在报告里陈述你所采用的各项优化的原理、出发点和效果。
 
 #### 4.2.3 多卡训练
 
@@ -238,20 +236,28 @@ some_data = some_data.to(device)
 * 数据并行则将全局批次大小（global batch size）按照流水线分组进行分割，每个流水线组都包含模型的一个副本，数据在组内按照局部批次规模送入模型副本，最后将各组得到的梯度进行加权平均得到总的梯度。
   ![](index.assets/Data-Parallelism.png)
 
-在pytorch、tensorflow等框架中都存在分布式训练的模块，为了减轻工作量，此部分也允许使用huggingface accelerate等模型库，以及其他的分布式训练加速框架。
+在pytorch、tensorflow等框架中都存在分布式训练的模块，为了减轻工作量，此部分也允许使用 huggingface accelerate 等模型库，以及其他的分布式训练加速框架。
 
 #### 4.2.4 模型评分规模
 
+对于以下的每个规模，你需要按照表格中给定的模型结构参数实现模型，并按照要求的 token 数量对模型进行训练。规定 token 数量训练结束后，若模型损失低于 7，认为模型训练成功，此时训练速度越快该测试点得分越高；否则认为模型训练失败，该测试点记零分。
+
 1. 评分规模一
-   | Model | Hidden  size | Attention- heads | Layers | Parameters (Million) | Sequence length |
-   | :---: | :----------: | :--------------: | :----: | :------------------: | :-------------: |
-   | 307M |     1024     |        16        |   20   |         307         |      1024      |
+   | Model size | Hidden size | Attention-heads | Layers | Sequence length | Tokens |
+   | :---: | :----------: | :--------------: | :----: | :-------------: | :-------------: |
+   | 117M |     768     |        12        |   12   |      1024      |      16M      |
 2. 评分规模二
+   | Model size | Hidden size | Attention-heads | Layers | Sequence length |Tokens |
+   | :---: | :----------: | :--------------: | :----: | :-------------: |:-------------: |
+   | 307M |     1024     |        16        |   20   |      1024      |16M      |
 3. 评分规模三
-   | Model | Hidden  size | Attention- heads | Layers | Parameters (Million) | Sequence length |
-   | :---: | :----------: | :--------------: | :----: | :------------------: | :-------------: |
-   | 566M |     1536     |        16        |   20   |         566         |      1024      |
+   | Model size | Hidden size | Attention-heads | Layers | Sequence length |Tokens |
+   | :---: | :----------: | :--------------: | :----: | :-------------: |:-------------: |
+   | 566M |     1536     |        16        |   20   |      1024      |16M      |
 4. 评分规模四
+    | Model size | Hidden size | Attention-heads | Layers | Sequence length |Tokens |
+   | :---: | :----------: | :--------------: | :----: | :-------------: |:-------------: |
+   | 1.2B |     1280     |        20        |   36   |      1024      |16M      |
 
 ## 5 实验任务与要求
 
@@ -265,7 +271,7 @@ some_data = some_data.to(device)
       2. 贴上两个模型训练过程的 **GPU 占用率截图**（使用 `nvidia-smi` 查看）
       3. Tensorboard **两个模型的损失曲线、LeNet-5 的准确率曲线等截图**
       4. 对于 LeNet-5，你需要写明测试集上的**识别正确率**
-      5. 对于 GPT，你需要写明每一个评分模型规模下训练完成的时间，以及最后的收敛情况（loss < 7 视为成功训练）
+      5. 对于 GPT，你需要写明每一个评分模型规模下训练完成的时间，最后的收敛情况，以及使用的加速策略
 4. ***LeNet-5 部分不允许直接使用各种深度学习开发工具已训练好的 CNN 网络结构与参数。***
 5. ***本次实验依然会进行查重，如果你参考了网络上的代码请在报告中列出，并体现出你的理解，否则一经查出视为抄袭***
 
