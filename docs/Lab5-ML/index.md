@@ -200,7 +200,15 @@ some_data = some_data.to(device)
 
 #### 4.2.1 文本数据预处理
 
-TBC（
+预处理最主要的工作是分词（tokenize）。分词器将文本拆分成词，再转换成数字以供模型训练。由于句子长短不一，可能需要进行填充或截断，最后生成输入的张量。
+
+分词的粒度，最自然的是按**单词划分**，例如英语中根据空格和标点符号划分，但生成的词表会很大，增加存储和计算复杂度；另一个极端是按**字母划分**，虽然词表会很小，但模型很难学到有意义的内容；因此现在一般使用**子词（subword）划分**，在词表中保留较短的常用词，生僻词则用常用词拼接而成。
+
+常用的分词算法有字节对编码（Byte-Pair Encoding, **BPE**）、WordPiece、Unigram、SentencePiece 等，其中 GPT 用的是 BPE。BPE 从单个字母的词表开始，通过不断合并高频字母对，直到达到预定的词表大小。WordPiece 与 BPE 基本相同，合并策略有所区别。
+
+具体原理介绍可参考 <https://huggingface.co/docs/transformers/tokenizer_summary>，[中文介绍](https://cloud.tencent.com/developer/article/1865689)。
+
+可以直接使用[huggingface 的预训练分词器](https://huggingface.co/docs/transformers/preprocessing)，如选择自己训练可以加分（
 
 #### 4.2.2 基准代码构建与加速
 
