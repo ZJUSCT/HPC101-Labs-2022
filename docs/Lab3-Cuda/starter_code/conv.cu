@@ -194,14 +194,16 @@ void conv_cuda(const uint8_t *const a, const uint8_t *const w, uint8_t *const b,
   cudaMemcpy(w_kernel, w, kernel * kernel * in_channel * out_channel * sizeof(uint8_t),
              cudaMemcpyHostToDevice);
   cudaMalloc(&b_kernel, batch_size * size * size * out_channel * sizeof(uint8_t));
+  // Start Timer.
+  cudaEventRecord(*start_e);
   // Run Conv2d Kernel,
   // Timer for computation cuda kernel.
   dim3 grid((size + block_size - 1) / block_size,
             (size + block_size - 1) / block_size);
   dim3 block(block_size, block_size);
-  cudaEventRecord(*start_e);
   conv2d_cuda_kernel<<<grid, block>>>(a_kernel, w_kernel, b_kernel);
   cudaDeviceSynchronize();
+  // Stop Timer
   cudaEventRecord(*stop_e);
   cudaEventSynchronize(*stop_e);
 

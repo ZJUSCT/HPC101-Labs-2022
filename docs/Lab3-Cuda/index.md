@@ -12,7 +12,7 @@
 
 ## 实验环境
 
-请大家在我们提供的集群上创建一个开发环境为 TensorFlow 的容器（要求最后在实验报告中展示环境基本信息），容器中含有 Nvidia GeForce RTX 2080 Ti 及 nvcc v10.1，无需自行配置。
+请大家在我们提供的集群上创建一个开发环境为 TensorFlow / Pytorch 的容器（要求最后在实验报告中展示环境基本信息），容器中含有 Nvidia GeForce RTX 2080 Ti 及 nvcc v10.1，无需自行配置。
 
 下图为某个可能的环境基本信息：
 
@@ -28,7 +28,8 @@
 >
 > 同构意义下，第零阶张量(r = 0)为标量(Scalar)，第一阶张量(r = 1)为向量 (Vector)，第二阶张量(r = 2)则为矩阵(Matrix)。  
 
-本实验中，张量概念作了解即可。实验中的卷积运算特指2个矩阵之间的卷积运算。
+实验中的卷积运算本实验涉及两个四维张量的运算。
+
 
 ## 卷积(convolution)
 
@@ -67,13 +68,47 @@ $$
 
 若 $$f$$ 的下标范围超出定义范围，本实验的方式是填充一个默认值 (0) 以解决问题，卷积结果与$$f$$大小相同。
 
+## Bank
+
+Bank的概念在不同种类的存储器中都有涉及，其是为了解决存储器并行访问的问题而提出的。以一个具有4个bank的存储器为例，我们往常在编程时认为逻辑上认为连续的内存在4个bank中的物理存储方式如下图所示：
+
+```
+Bank 0    Bank 1    Bank 2    Bank 3
+
+MEM[0]    MEM[1]    MEM[2]    MEM[3]
+MEM[4]    MEM[5]    MEM[6]    MEM[7]
+MEM[8]    MEM[9]    MEM[10]   MEM[11]
+...       ...       ...       ...
+```
+
+于是在同一时间我们访问诸如 `MEM[0], MEM[9], MEM[6], MEM[3]` 的存储空间就不会产生冲突，大大提高了程序的效率；否则，最差的情况下，若连续的访存序列均位于同一 bank，则效率等于串行的 4 次存储访问。
+
+需要注意的是，若存储器的 bank 进行过针对性的优化，多个线程访问同一 bank 的同一位置可以通过同时向所有线程广播数据进行解决，同样不会产生 bank conflict 问题。
+
+
+
 ## 实验步骤
 
 ### 基准代码
 
-在实际的卷积计算中，一次会进行多批（batch）的处理，比如一次处理多张图片。以及同一个坐标具有多通道（channel）值，比如图片里的R、G、B三通道。`batch_size`和`in_channel`、`out_channel`定义于代码的开头。
+在实际的卷积计算中，一次会进行多批(batch)的处理，比如一次处理多张图片(HxW大小)。以及同一个坐标具有多通道(channel)值，比如图片里的R、G、B三通道。`batch_size`和`in_channel`、`out_channel`定义于代码的开头。
 
-二维卷积计算的 CPU 版本已在 `conv_test.cu` 中的`conv2d_cpu_kernel`给出，用以验证正确性。即通过批、x、y、卷积核高、卷积核宽的五层循环轮流计算结果矩阵中每个位置的值。其中做了padding的0填充等处理。
+代码中的注释和变量名遵循以下习惯：
+
+- 输入输出张量的尺寸: `size`, `H`, `W`
+- 输入、输出张量的批(batch)的大小: `batch_size`, `N`
+- 输入张量的通道数: `in_channel`, `CI`
+- 输出张量的通道数: `out_channel`, `CO`
+- 卷积核的尺寸: `kernel`, `KH`, `KW`
+
+我们看到，卷积运算中涉及的三个张量都是四维的，我们规定它们的形状分别为：
+
+- Input: `N x H x W x CI`
+- Kernel: `KH x KW x CI x CO`
+- Output: `N x H x W x CO`
+
+
+二维卷积计算的 CPU 版本已在 `conv_test.cu` 中的`conv2d_cpu_kernel`给出，用以验证正确性。即通过批、输入通道、输出通道、卷积核高、卷积核宽的五层循环轮流计算结果矩阵中每个位置的值。其中做了padding的0填充等处理。
 
 基准代码为程序中的`conv2d_cuda_kernel`核函数，是未经优化的五层循环嵌套GPU实现，你可以在此基础上进行改进，亦或者重新自己实现。
 
@@ -88,8 +123,6 @@ __global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a,
     for (int s = 0; s < batch_size; ++s) {
       for (int CO = 0; CO < out_channel; ++CO) {
         uint8_t conv = 0;
-        // Conv2d for a single pixel, single output channel.
-        for (int CI = 0; CI < in_channel; ++CI) {
           int x = i - kernel / 2, y = j - kernel / 2;
           for (int k = 0; k < kernel; ++k) {
             for (int l = 0; l < kernel; ++l) {
@@ -138,7 +171,17 @@ __global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a,
 
 如果程序遇到难以解决的正确性问题，不妨考虑两个关键词： `sync` 和 `atomic`。
 
-另外在我们本次实验提供的 GPU（RTX 2080Ti） 上，包含一个叫做 TensorCore 的硬件，它能够进一步加速卷积的计算，你可以查阅相关资料，使用 TensorCore 进行进一步的加速。
+另外在我们本次实验提供的 GPU (RTX 2080Ti) 上，包含一个叫做 TensorCore 的硬件，它能够进一步加速卷积的计算， 在Cuda 9.0之后，你可以使用内嵌`PTX`汇编或者CUDA的C++扩展`nvcuda::wmma`的方式
+来显式地调用Tensor Core来进行计算。
+
+Tensor Core能在一个周期内完成一个小矩阵乘法，因而提高计算效率，但是Tensor Core对作矩阵乘法的两个矩阵的形状要求比较高(例如4x4x4，8x8x8等)，你需要合理地对矩阵进行切分和对Wrap中的线程合理分配来发挥出Tensor Core的计算性能。了解如何调用Tensor Core，可以查阅文档尾部的参考文献。
+
+使用Tensor Core完成本次lab，你将会获得Bonus
+
+
+## 实验初始代码
+
+详见 [starter_code](https://github.com/ZJUSCT/HPC101-Labs-2022/blob/main/docs/Lab2-Cuda/starter_code)
 
 ## 实验任务与要求
 
@@ -165,3 +208,10 @@ __global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a,
 3. 优化结果普通，我们将参考你对实验手册中提到的优化策略的尝试与努力（报告与代码）进行给分——若你已经尽力尝试了手册中所有的优化思路，你可以取得（95+）的分数。
 
 请让我们看到你的尝试，即使代码不能运行或者结果错误也不要羞涩于提交（否则实在捞不起来）！
+
+## 参考文献
+
+- NVIDIA [Convolutional Layers User's Guide](https://docs.nvidia.com/deeplearning/performance/dl-performance-convolutional/)
+- NVIDIA Developer Blog [Tips for Optimizing GPU Performance Using Tensor Cores](https://developer.nvidia.com/blogoptimizing-gpu-performance-tensor-cores/)
+- `nvcuda::wmma` CUDA C++ Extension [NVIDIA CUDA C Programming Guide](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#wmma)
+- [NVIDIA PTX ISA](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html)
