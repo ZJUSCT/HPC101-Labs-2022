@@ -4,6 +4,7 @@ theme:
 nav:
   - Lab1-MiniCluster: Lab1-MiniCluster/index.md
   - Lab2-Vectors: Lab2-Vectors/index.md
+  - Lab2.5-Vectors-Bonus: Lab2.5-Vectors-Bonus/index.md
   - Lab3-Cuda: Lab3-Cuda/index.md
   - Lab4-Gemm: Lab4-Gemm/index.md
   - Lab5-ML: Lab5-ML/index.md
