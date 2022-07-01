@@ -38,7 +38,21 @@ LeNet-5是一个较简单的卷积神经网络。下图显示了其结构：输�
 
 #### 3.1.3 GPT
 
-TODO: 1
+> ~~这里介绍的不是 GUID Partition Table~~
+
+在自然语言处理（natural language processing, NLP）中，早期使用的是循环神经网络（Recurrent Neural Network, **RNN**）。RNN 与 CNN 这样的前馈网络不同，RNN 中存在反馈和隐藏单元，使它可以「记住」之前读到的内容。为了解决深层网络中梯度消失或爆炸的问题，引入了长短期记忆（Long short-term memory, **LSTM**）。而为了解决传统 RNN 只能记住前面的问题，提出了双向的 LSTM。在此基础上引入的注意力机制（attention），使得网络能注意句子中重要位置的信息，例如允许在翻译中可以改变词语的顺序。
+
+不久后，研究者发现只靠注意力机制而无需 RNN 或 CNN，就能达到较好的效果，这就是 Transformer 模型。与 RNN 不同的是，Transformer 模型能够一次性处理所有输入数据。注意力机制可以为输入序列中的任意位置提供上下文。这种架构允许更高的并行度，并以此减少训练时间。
+
+以下为 Transformer 的结构：包含编码器和解码器，都由多个多头自注意力机制和全连接层堆叠而成，层间和层内存在归一化操作；输入由词嵌入向量加上位置信息得出。
+
+![](index.assets/transformer.png)
+
+Transformer 的详细结构和原理较为复杂，可参考[原论文](https://arxiv.org/abs/1706.03762)。
+
+2018 年，OpenAI 提出了生成预训练 Transformer 模型（Generative Pre-trained Transformer, **GPT**）。与先前基于监督式学习的 NLP 模型不同，GPT 在预训练生成阶段是无监督的（不需要标注），只在需要适应特定任务的**微调**（fine-tuning）时需要监督，降低了大规模 NLP 模型的门槛。GPT 的结构是 12 层仅包含解码器的 Transformer。一年后的 GPT-2 是对 GPT 的直接放大，参数量和数据集都增加了一个量级，参数量达到了 15 亿，取得了更好的效果和迁移学习能力。下一代的 GPT-3 达到了 1750 亿参数，生成的文章已经很难与人类写的区分出来。在一些领域，GPT-3 也**不再需要**专门的微调，而只需要提供例子等文本交互即可完成任务。大家可能熟悉的 GitHub Copilot 也是 GPT 的一个主要应用。
+
+可以查看 GPT-3 的[原论文](https://arxiv.org/abs/2005.14165)。
 
 ### 3.2 数据集
 
@@ -52,9 +66,9 @@ MNIST 数据集下载： http://yann.lecun.com/exdb/mnist/index.html
 
 #### 3.2.2 Web of Science 数据集
 
-https://data.mendeley.com/datasets/9rw3vkcfy4/6
+Web of Science 是一个付费的文献元数据库，通过校网可以免费使用。该数据集原先用于文本层次化分类，由于我们采用的是无监督学习的预训练，因此不关心它给出的标签，只要用目录下的 X 文本训练。元数据目录（包含摘要和关键词）也可以忽略。
 
-TODO: 2
+数据集下载：https://data.mendeley.com/datasets/9rw3vkcfy4/6
 
 ## 4 实验步骤
 
@@ -182,11 +196,11 @@ some_data = some_data.to(device)
 ```
 - 相比于原生的 `PyTorch`，`PyTorch Lightning` 框架对其进行了更高层次的封装，很大程度上简化了模型定义、训练以及测试的步骤，使用 `PyTorch Lightning` 作为本次实验的加分项，官网链接已附在参考资料中。如果你能够在 TensorBoard 中将中间层可视化，你能得到更多的加分。
 
-### 4.2 GPT 训练加速
+### 4.2 GPT 训练与加速
 
 #### 4.2.1 文本数据预处理
 
-TODO: 3
+TBC（
 
 #### 4.2.2 基准代码构建与加速
 
@@ -217,7 +231,7 @@ TODO: 5
 
 1. 使用 `PyTorch` 实现最基本的卷积神经网络 LeNet-5，并在 MNIST 数据集上使用 GPU 进行训练，并对测试集进行测试。
 
-2. 使用 `PyTorch` 实现更复杂的卷积神经网络，结构可以自行设计，并在CIFAR 10 数据集上使用 GPU 进行训练，并对测试集进行测试。
+2. 使用 `PyTorch` 及相关模型库实现类 GPT 网络，在 Web of Science 数据集上进行训练，并尝试对模型训练进行加速。
 
 3. 你需要提交：
    1. 全部代码
@@ -243,3 +257,5 @@ TODO: 5
 - MNIST 数据集 http://yann.lecun.com/exdb/mnist/index.html
 
 - LeNet-5 网络结构 http://yann.lecun.com/exdb/lenet/
+
+- GPT 网络介绍 https://en.wikipedia.org/wiki/GPT-2
