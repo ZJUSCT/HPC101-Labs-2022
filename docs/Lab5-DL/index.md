@@ -272,7 +272,6 @@ some_data = some_data.to(device)
 1. 使用 `PyTorch` 实现最基本的卷积神经网络 LeNet-5，并在 MNIST 数据集上使用 GPU 进行训练，并对测试集进行测试。
 2. 使用 `PyTorch` 及相关模型库实现类 GPT 网络，在 Web of Science 数据集上进行训练，并尝试对模型训练进行加速。
 3. 你需要提交：
-
    1. 全部代码
    2. 实验报告，其中需要包含：
       1. 简要实验过程
