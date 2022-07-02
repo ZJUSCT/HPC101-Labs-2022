@@ -2,12 +2,12 @@ site_name: HPC101-Labs-2022
 theme:
   name: material
 nav:
-  - Lab1-MiniCluster: Lab1-MiniCluster/index.md
-  - Lab2-Vectors: Lab2-Vectors/index.md
-  - Lab2.5-Vectors-Bonus: Lab2.5-Vectors-Bonus/index.md
-  - Lab3-Cuda: Lab3-Cuda/index.md
+  - Lab1-简单集群搭建: Lab1-MiniCluster/index.md
+  - Lab2-向量化计算: Lab2-Vectors/index.md
+  - Lab2.5-Bonus 手写 SIMD 向量化: Lab2.5-Vectors-Bonus/index.md
+  - Lab3-CUDA 使用基础: Lab3-Cuda/index.md
   - Lab4-Gemm: Lab4-Gemm/index.md
-  - Lab5-ML: Lab5-ML/index.md
+  - Lab5-深度神经网络训练与加速: Lab5-DL/index.md
 markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
@@ -16,6 +16,7 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - tables
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
