@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define MAXN 100000000
 
@@ -39,11 +40,11 @@ int main()
     printf("time=%f\n", (double)(end - start) / CLOCKS_PER_SEC);
     for (int i = 0; i < MAXN; ++i)
     {
-        if ((c[i] - d[i]) / d[i] > 0.0001)
+        if (fabs(c[i] - d[i]) / d[i] > 0.0001)
         {
             printf("Check Failed at %d\n", i);
-            exit(1);
+            return 0;
         }
     }
-    puts("Check Passed");
+    printf("Check Passed");
 }
