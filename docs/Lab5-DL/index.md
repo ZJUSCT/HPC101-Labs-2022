@@ -284,8 +284,8 @@ some_data = some_data.to(device)
 
 ## 参考资料
 
-- `PyTorch` 框架 https://pytorch.org/
-- `PyTorch Lightning` 框架 https://www.pytorchlightning.ai/
-- MNIST 数据集 http://yann.lecun.com/exdb/mnist/index.html
-- LeNet-5 网络结构 http://yann.lecun.com/exdb/lenet/
-- GPT 网络介绍 https://en.wikipedia.org/wiki/GPT-2
+- `PyTorch` 框架 [https://pytorch.org/](https://pytorch.org/)
+- `PyTorch Lightning` 框架 [https://www.pytorchlightning.ai/](https://www.pytorchlightning.ai/)
+- MNIST 数据集 [http://yann.lecun.com/exdb/mnist/index.html](http://yann.lecun.com/exdb/mnist/index.html)
+- LeNet-5 网络结构 [http://yann.lecun.com/exdb/lenet/](http://yann.lecun.com/exdb/lenet/)
+- GPT 网络介绍 [https://en.wikipedia.org/wiki/GPT-2](https://en.wikipedia.org/wiki/GPT-2)

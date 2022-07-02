@@ -1,16 +1,16 @@
-# 实验3：CUDA使用基础
+# 实验三：CUDA使用基础
 
-## 实验简介
+## 1 实验简介
 
 卷积（[Convolution](https://en.wikipedia.org/wiki/Convolution)）是一种基本的数学运算，想必大家在微积分、概率论与数理统计等数学基础课程中都一定程度上接触过。作为一种基本的数学计算，其在图像处理、机器学习等领域都有重要应用。
 
-本次实验需要你使用 CUDA 完成一个 GPU 上的二维离散卷积。  
+本次实验需要你使用 CUDA 完成一个 GPU 上的二维离散卷积。
 
 你可以自由选择使用 CUDA Runtime API 或者 CUDA Driver API 进行编程，但不能调用高性能计算的Library代替你自己实现卷积。本实验推荐采用 CUDA Runtime API，使用更加简单方便，相较Driver几乎不损失性能。
 
 ![API](img/API.png)
 
-## 实验环境
+## 2 实验环境
 
 请大家在我们提供的集群上创建一个开发环境为 TensorFlow / Pytorch 的容器（要求最后在实验报告中展示环境基本信息），容器中含有 Nvidia GeForce RTX 2080 Ti 及 nvcc v10.1，无需自行配置。
 
@@ -18,24 +18,24 @@
 
 ![env_info](img/env_info.png)
 
-## 实验基础知识介绍
+## 3 实验基础知识介绍
 
 该部分简要介绍和实验相关的基础知识，为方便理解，不保证数学上的严谨性。
 
-## 张量(tensor)
+### 3.1 张量(tensor)
 
-> 张量概念是矢量概念的推广，矢量是一阶张量。张量是一个可用来表示在一些矢量、标量和其他张量之间的线性关系的多线性函数。  
+> 张量概念是矢量概念的推广，矢量是一阶张量。张量是一个可用来表示在一些矢量、标量和其他张量之间的线性关系的多线性函数。
 >
-> 同构意义下，第零阶张量(r = 0)为标量(Scalar)，第一阶张量(r = 1)为向量 (Vector)，第二阶张量(r = 2)则为矩阵(Matrix)。  
+> 同构意义下，第零阶张量(r = 0)为标量(Scalar)，第一阶张量(r = 1)为向量 (Vector)，第二阶张量(r = 2)则为矩阵(Matrix)。
 
 实验中的卷积运算本实验涉及两个四维张量的运算。
 
 
-## 卷积(convolution)
+### 3.2 卷积(convolution)
 
 本实验只涉及离散运算，连续形式的卷积不做介绍，感兴趣的同学可以自行了解。
 
-### 一维离散卷积
+#### 3.2.1 一维离散卷积
 
 定义 $\left(f*g\right)\left(n\right)$ 为函数  $f$ 与  $g$ 的卷积
 
@@ -49,7 +49,7 @@ $$
 
 可以形象地理解为沿着不断移动的 $x+y=n$ 直线，将两个函数卷成一个新的函数，每条直线对应新函数的一组对应关系。
 
-### 二维离散卷积
+#### 3.2.2 二维离散卷积
 
 二维离散卷积可以视为一维离散卷积的推广。
 
@@ -60,14 +60,14 @@ $$
 我们在实验中的定义卷积与数学上的定义存在差别，我们认为其在广义上属于二维离散卷积。
 
 简化起见，考虑两个方阵 $f$ 和 $g$，$f$ 的大小为 $a*a$，$g$ 的大小为 $b*b$，我们将 $g$ 称为核（kernel）函数，且要求 $b$ 为奇数。$f$ 行列下标均从 0 开始，
-$g$ 的行列下标则从 $-\lfloor b/2\rfloor$ 到 $+\lfloor b/2\rfloor$ （包括0） ，此时卷积的结果可以定义为: 
+$g$ 的行列下标则从 $-\lfloor b/2\rfloor$ 到 $+\lfloor b/2\rfloor$ （包括0） ，此时卷积的结果可以定义为:
 $$
 \left(f*g\right)\left(n,m\right)=\Sigma_{i=-\lfloor b/2\rfloor}^{+\lfloor b/2\rfloor}\Sigma_{j=-\lfloor b/2\rfloor}^{+\lfloor b/2\rfloor}f\left(n+i,m+j\right)g\left(i,j\right)
 $$
 
 若 $f$ 的下标范围超出定义范围，本实验的方式是填充一个默认值 (0) 以解决问题，卷积结果与$f$大小相同。
 
-## Bank
+### 3.3 Bank
 
 Bank的概念在不同种类的存储器中都有涉及，其是为了解决存储器并行访问的问题而提出的。以一个具有4个bank的存储器为例，我们往常在编程时认为逻辑上认为连续的内存在4个bank中的物理存储方式如下图所示：
 
@@ -86,9 +86,9 @@ MEM[8]    MEM[9]    MEM[10]   MEM[11]
 
 
 
-## 实验步骤
+## 4 实验步骤
 
-### 基准代码
+### 4.1 基准代码
 
 在实际的卷积计算中，一次会进行多批(batch)的处理，比如一次处理多张图片(HxW大小)。以及同一个坐标具有多通道(channel)值，比如图片里的R、G、B三通道。`batch_size`和`in_channel`、`out_channel`定义于代码的开头。
 
@@ -116,10 +116,10 @@ MEM[8]    MEM[9]    MEM[10]   MEM[11]
 
 基准代码为程序中的`conv2d_cuda_kernel`核函数，是未经优化的五层循环嵌套GPU实现，你可以在此基础上进行改进，亦或者重新自己实现。
 
-```c++
-__global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a, 
-                                   const uint8_t *__restrict__ w, 
-                                   uint8_t *__restrict__ b) 
+```c++ linenums="1"
+__global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a,
+                                   const uint8_t *__restrict__ w,
+                                   uint8_t *__restrict__ b)
 {
   const int i = blockIdx.x * block_size + threadIdx.x;
   const int j = blockIdx.y * block_size + threadIdx.y;
@@ -147,31 +147,31 @@ __global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a,
 }
 ```
 
-### Shared Memory
+### 4.2 Shared Memory
 
 正如课上所讲，GPU 中有一块共享内存被同一线程块中的线程共享，在存储层级中，Shared Memory与L1 Cache同级，部分GPU架构中还可以手动分配L1 Cache与Shared Memory的大小；利用Shared Memory将线程块的密集访存加速能够获得极低的访存延迟且大大节省内存带宽。
 
 <img src="img/shared_memory.png" alt="shared_memory" style="zoom: 40%;" />
 
-### Blocking
+### 4.3 Blocking
 
-可以对大矩阵进行分块计算，提高访存局部性。这一技术在 lab4 中会详细讲述。  
+可以对大矩阵进行分块计算，提高访存局部性。这一技术在 lab4 中会详细讲述。
 
 以下是矩阵乘法的分块示意图，卷积优化思路可以参考矩阵乘法分块思路。
 
 <img src="img/block_part.png" alt="block_optimization" style="zoom:33%;" />
 
-### Virtual Thread Split
+### 4.4 Virtual Thread Split
 
 重新组织线程的编号方式与执行顺序(自由发挥)，尽可能的防止bank conflict，最大化利用显存带宽。
 
 为了提高线程读写带宽，GPU 中的共享内存会被划分成若干个 bank，理想状况下，各个线程同一时间访问的 bank 应该是不同的。
 
-### Cooperative Fetching
+### 4.5 Cooperative Fetching
 
 为了减少单个线程的内存访问量，可以让每个线程块中的线程合作访问有共同依赖的部分；共享内存是有限的，将访存重叠度高的线程安排在单个线程块中，从全局内存中加载访问更密集的数据到共享内存，都可以提升程序效率。
 
-### Hint & Bonus
+### 4.6 Hint & Bonus
 
 如果程序遇到难以解决的正确性问题，不妨考虑两个关键词： `sync` 和 `atomic`。
 
@@ -183,11 +183,11 @@ Tensor Core能在一个周期内完成一个小矩阵乘法，因而提高计算
 使用Tensor Core完成本次lab，你将会获得Bonus。
 
 
-## 实验初始代码
+## 5 实验初始代码
 
 详见 [starter_code](https://github.com/ZJUSCT/HPC101-Labs-2022/tree/main/docs/Lab3-Cuda/starter_code)。
 
-## 实验任务与要求
+## 6 实验任务与要求
 
 利用以上技术(包括但不限于)，在基准程序的基础上实现卷积计算的 GPU 实现并优化之。
 
@@ -201,7 +201,7 @@ Tensor Core能在一个周期内完成一个小矩阵乘法，因而提高计算
 
 > **Note**: 调试时为使错误可复现，可以将代码中的 `std::default_random_engine generator(r());` 改为 `std::default_random_engine generator;`，这样每次生成的随机矩阵都会是一致的。
 
-## 评价标准
+## 7 评价标准
 
 若参考互联网资料或者代码请在报告中注明出处。
 

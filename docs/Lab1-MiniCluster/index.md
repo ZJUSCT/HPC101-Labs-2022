@@ -1,6 +1,6 @@
 # 实验一：简单集群搭建
 
-## 实验简介
+## 1 实验简介
 
 本次实验要求使用四台虚拟机搭建一个简易的集群，并对该集群进行性能测试，最后提交测试结果和实验报告。
 
@@ -8,19 +8,19 @@
 
 性能测试通过使用 OpenMPI 将 HPL 测试程序分配到四个虚拟机节点上执行。因此，需要下载并编译 OpenMPI、BLAS 和 HPL 的源代码，其中 OpenMPI、BLAS是 HPL 的依赖项。
 
-## 实验环境
+## 2 实验环境
 
 - 一台计算机，操作系统任意
 - Hypervisor (本手册为 Virtual Box)
 - 虚拟机 * 4
 
-## 实验基础知识介绍
+## 3 实验基础知识介绍
 
-### 计算机集群
+### 3.1 计算机集群
 
 [计算机集群](https://en.wikipedia.org/wiki/Computer_cluster)是连接在一起、协同工作的一组计算机，集群中的每个计算机都是一个节点。在集群中，由软件将不同的计算任务（task）分配（schedule）到相应的一个或一群节点（node）上。本次实验中，需要使用 OpenMPI 将 HPL 程序作为 task 分配到集群中的四个节点上。
 
-#### 虚拟机
+#### 3.1.1 虚拟机
 
 虚拟机为运行在其中的guest操作系统和应用提供了一个模拟的硬件环境，和真实的硬件保持一样的接口和表现，同时也如真实的硬件一样为其中的操作系统和程序提供保护机制、管理接口和资源限制。一个简易的非虚拟机和虚拟机结构的对比如下图（来源：Abraham Silberschatz, Peter Baer Galvin, Greg Gagn, *Operating System Concepts*, 10th edition, Chapter 18)
 
@@ -30,13 +30,13 @@
 
 ![](pics/image-20210714120624669.png)
 
-#### Linux发行版
+#### 3.1.2 Linux发行版
 
 Linux 发行版（也被叫做 GNU/Linux 发行版），为一般用户预先集成好的 Linux 操作系统及各种应用 软件。一般用户不需要重新编译，在直接安装之后，只需要小幅度更改设置就可以使用，通常以软件包管理系统来进行应用软件的管理。Linux 发行版通常包含了包括桌面环境、办公包、媒体播放器、数据库等应用软件。这些操作系统通常由 Linux 内核、以及来自 GNU 计划的大量的函数库，和基于 X Window 的图形界面。现在有超过 300 个 Linux发行版。大部分都正处于活跃的开发中，不断地改进。由于大多数软件包是自由软件和开源软件，所以 Linux 发行版的形式多种多样——从功能齐全的桌面系统以及服务器系统到小型系统 (例如一些嵌入式设备)。除了一些定制软件 (如安装和配置工具)，发行版通常只是将特定的应用软件安装在一堆函数库和内核上，以满足特定用户的需求。
 
 这些发行版可以分为商业发行版，比如 Ubuntu（Canonical 公司）、Fedora（Red Hat）、openSUSE （Novell）和 Mandriva Linux；和社区发行版，它们由自由软件社区提供支持，如 Debian 和 Gentoo；也有发行版既不是商业发行版也不是社区发行版，如 Slackware。
 
-### HPL
+### 3.2 HPL
 
 HPL是一个可以在分布式系统上运行的解稠密线性系统的软件包，同时也可以被用来做高性能计算Linpack测试（High Performance Computing Linpack Benchmark）。
 
@@ -50,11 +50,11 @@ OpenMPI 是一个开源的 [Message Passing Interface](http://www.mpi-forum.org/
 
 BLAS 是 Basic Linear Algebra Subprograms 的缩写，本手册只要求将其作为 HPL 的依赖项下载安装即可，无需过多了解。
 
-## 实验步骤
+## 4 实验步骤
 
-### 下载 Hypervisor 和 Linux 光盘映像文件
+### 4.1 下载 Hypervisor 和 Linux 光盘映像文件
 
-#### Hypervisor
+#### 4.1.1 Hypervisor
 
 在创建虚拟机之前，你需要先准备好 Hypervisor，在本手册中，我们以 Virtual Box 为例，其他的 Hypervisor 请自行参阅相关材料：
 
@@ -68,7 +68,7 @@ BLAS 是 Basic Linear Algebra Subprograms 的缩写，本手册只要求将其�
 
     由于本次实验希望大家从裸机手工完成完整的集群配置，包括网络和系统软件环境等，因此本次实验不推荐大家使用 Docker，如果学有余力可以尝试使用 Docker 复现本次实验，作为加分项（虚拟机为必做）。
 
-#### Linux 光盘映像文件
+#### 4.1.2 Linux 光盘映像文件
 
 本手册所使用的范例发行版是 Debian 11，同学可根据自己的喜好和经验挑选适合的发行版。
 Debian 下载点（如果网速问题可访问国内镜像）：
@@ -96,9 +96,9 @@ Debian 下载点（如果网速问题可访问国内镜像）：
 
         Linux 发行版相当多，不熟悉或没使用过 Linux 的同学建议参考本手册，相信自己已经有一定基础的同学可以忽略。
 
-### 搭建集群并安装相关程序
+### 4.2 搭建集群并安装相关程序
 
-#### 创建虚拟机
+#### 4.2.1 创建虚拟机
 
 准备好 Hypervisor 跟 光盘映像后，就可以着手安装一个虚拟机了，请参考 Virtual Box 手册和相关教程。
 
@@ -135,7 +135,7 @@ Debian 下载点（如果网速问题可访问国内镜像）：
 
     在刚刚插入映像文件的地方取消选取映像文件，否则下次重启时还会进入 Live CD。
 
-#### 下载并安装 OpenMPI
+#### 4.2.2 下载并安装 OpenMPI
 
 由于系统中的包通常比较旧，因此我们从 OpenMPI 的官网中下载最新版本源码自行编译安装：[OpenMPI 下载](https://www.open-mpi.org/software/ompi/v4.1/)。
 
@@ -147,7 +147,7 @@ Debian 下载点（如果网速问题可访问国内镜像）：
 
     请将找到 OpenMPI 二进制文件的目录加入 `PATH` 环境变量，OpenMPI 库的目录加入 `LD_LIBRARY_PATH` 环境变量。
 
-#### 下载并安装 HPL
+#### 4.2.3 下载并安装 HPL
 
 下载地址：[https://netlib.org/benchmark/hpl/software.html](https://netlib.org/benchmark/hpl/software.html)
 
@@ -197,17 +197,17 @@ LINKER = $(CC)
 make arch=test
 ```
 
-#### 克隆节点
+#### 4.2.4 克隆节点
 
 在 Virtual Box 中，克隆已经配置完成的节点成为集群中的其他节点，本手册范例中仅克隆一个（集群中两个节点），可克隆更多。
 
-### 测试集群
+### 4.3 测试集群
 
-#### ping
+#### 4.3.1 ping
 
 `ping` 是测试节点网络连通性最为简单的方式，在进行其他测试前，请先确认能 `ping` 通所有节点。
 
-#### 配置 ssh
+#### 4.3.2 配置 ssh
 
 `ssh` 是相当常用的，实现安全远程连接的方式，其原理和使用、配置方法请查阅相关参考资料：[Open SSH 网站](https://www.openssh.com/manual.html)
 如果你没有 ssh 密钥，可以在其中一个节点创建一个：
@@ -221,7 +221,7 @@ ssh-keygen
 
     如果自己的密钥有 passphrase，那么请使用 `ssh-agent` 确保能暂时不用输入 passphrase，以免之后影响 `mpirun` 正确运行。
 
-#### mpirun
+#### 4.3.3 mpirun
 
 尽管对 OpenMPI 十分陌生，我们还是能利用它来跑非 MPI 的程序，同学可以编写简单的 Helloworld 程序来测试 OpenMPI，或者直接使用 Unix 命令。
 
@@ -249,7 +249,7 @@ mpirun --hostfile myhostfile uptime
 mpirun --hostfile myhostfile ./xhpl
 ```
 
-## 实验任务与要求
+## 5 实验任务与要求
 
 1. 搭建四个节点的虚拟机并记录过程，要求提供必要的截图或配置文件
 2. 使用 OpenMPI 和 HPL 测试集群表现并记录结果
