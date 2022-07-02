@@ -112,10 +112,10 @@ MEM[8]    MEM[9]    MEM[10]   MEM[11]
 - Kernel: `KH x KW x CI x CO`
 - Output: `N x H x W x CO`
 
-在二维矩阵的二维离散卷积的数学表达式基础上，我们添加批和通道两个维度，得到本次实验最终二维卷积的表达式如下:
+在上述二维矩阵的二维离散卷积的数学表达式基础上，我们添加批和通道两个维度，得到本次实验最终二维卷积的表达式如下:
 
 $$
-\left(f*g\right)\left(n,x,y,co\right)=\sum_{i=-\lfloor KH/2\rfloor}^{\lfloor KH/2\rfloor}\sum_{j=-\lfloor KW/2\rfloor}^{\lfloor KW/2\rfloor}\sum_{ci=0}^{CI}f\left(n,x,y,ci\right)g\left(x+i,y+j,ci,co\right)
+\left(f*g\right)\left(n,x,y,co\right)=\sum_{i=-\lfloor KH/2\rfloor}^{\lfloor KH/2\rfloor}\sum_{j=-\lfloor KW/2\rfloor}^{\lfloor KW/2\rfloor}\sum_{ci=0}^{CI}f\left(n,x+i,y+j,ci\right)g\left(i,j,ci,co\right)
 $$
 
 二维卷积计算的 CPU 版本已在 `conv.cu` 中的`conv2d_cpu_kernel`给出，用以验证正确性。即通过批、输入通道、输出通道、卷积核高、卷积核宽的五层循环轮流计算结果矩阵中每个位置的值。其中做了 padding 的0填充等处理。
@@ -192,7 +192,7 @@ __global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a,
 另外在我们本次实验提供的 GPU (RTX 2080Ti) 上，包含一个叫做 TensorCore 的硬件，它能够进一步加速卷积的计算， 在 Cuda 9.0 之后，你可以使用内嵌`PTX`汇编或者 CUDA 的 C++ 扩展`nvcuda::wmma`的方式
 来显式地调用Tensor Core来进行计算。
 
-Tensor Core 能在一个周期内完成一个小矩阵乘法，因而提高计算效率，但是Tensor Core对作矩阵乘法的两个矩阵的形状要求比较高(例如4x4x4，8x8x8等)，你需要合理地对矩阵进行切分和对 Wrap 中的线程合理分配来发挥出 Tensor Core 的计算性能。了解如何调用 Tensor Core，可以查阅文档尾部的参考文献。
+Tensor Core 能在一个周期内完成一个小矩阵乘法，因而提高计算效率，但是Tensor Core对作矩阵乘法的两个矩阵的形状要求比较高(例如4x4x4，8x8x8等)，你需要合理地对矩阵进行切分和对 Wrap和Block 中的线程进行分配来最大化 Tensor Core 的计算性能。了解如何调用 Tensor Core，可以查阅文档尾部的参考文献。
 
 使用 Tensor Core 完成本次实验，你将会获得 Bonus。
 
@@ -232,4 +232,4 @@ Tensor Core 能在一个周期内完成一个小矩阵乘法，因而提高计�
 - NVIDIA [Convolutional Layers User's Guide](https://docs.nvidia.com/deeplearning/performance/dl-performance-convolutional/)
 - NVIDIA Developer Blog [Tips for Optimizing GPU Performance Using Tensor Cores](https://developer.nvidia.com/blogoptimizing-gpu-performance-tensor-cores/)
 - `nvcuda::wmma` CUDA C++ Extension [NVIDIA CUDA C Programming Guide](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#wmma)
-- [NVIDIA PTX ISA](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html)
+- Parallel Thread Execution [NVIDIA PTX ISA](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html)
