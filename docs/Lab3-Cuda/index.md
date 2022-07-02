@@ -96,7 +96,7 @@ MEM[8]    MEM[9]    MEM[10]   MEM[11]
 >
 > ![conv](img/conv.png)
 >
-> > 图片上经过卷积计算，输出的尺寸变小了，而我们的实验中是为输入加上了值为0的 padding ，所以输入和输出的二维尺寸是一致的。
+>  图片上经过卷积计算，输出的尺寸变小了，而我们的实验中是为输入加上了值为0的 padding ，所以输入和输出的二维尺寸是一致的。
 
 代码中的注释和变量名遵循以下习惯：
 
@@ -111,6 +111,12 @@ MEM[8]    MEM[9]    MEM[10]   MEM[11]
 - Input: `N x H x W x CI`
 - Kernel: `KH x KW x CI x CO`
 - Output: `N x H x W x CO`
+
+在二维矩阵的二维离散卷积的数学表达式基础上，我们添加批和通道两个维度，得到本次实验最终二维卷积的表达式如下:
+
+$$
+\left(f*g\right)\left(n,x,y,co\right)=\sum_{i=-\lfloor KH/2\rfloor}^{\lfloor KH/2\rfloor}\sum_{j=-\lfloor KW/2\rfloor}^{\lfloor KW/2\rfloor}\sum_{ci=0}^{CI}f\left(n,x,y,ci\right)g\left(x+i,y+j,ci,co\right)
+$$
 
 二维卷积计算的 CPU 版本已在 `conv.cu` 中的`conv2d_cpu_kernel`给出，用以验证正确性。即通过批、输入通道、输出通道、卷积核高、卷积核宽的五层循环轮流计算结果矩阵中每个位置的值。其中做了 padding 的0填充等处理。
 
