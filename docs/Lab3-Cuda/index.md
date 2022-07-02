@@ -69,7 +69,7 @@ $$
 
 ### 3.3 Bank
 
-Bank的概念在不同种类的存储器中都有涉及，其是为了解决存储器并行访问的问题而提出的。以一个具有4个bank的存储器为例，我们往常在编程时认为逻辑上认为连续的内存在4个bank中的物理存储方式如下图所示：
+Bank 的概念在不同种类的存储器中都有涉及，其是为了解决存储器并行访问的问题而提出的。以一个具有4个 bank 的存储器为例，我们往常在编程时认为逻辑上认为连续的内存在4个 bank 中的物理存储方式如下图所示：
 
 ```
 Bank 0    Bank 1    Bank 2    Bank 3
@@ -92,6 +92,12 @@ MEM[8]    MEM[9]    MEM[10]   MEM[11]
 
 在实际的卷积计算中，一次会进行多批(batch)的处理，比如一次处理多张图片(HxW大小)。以及同一个坐标具有多通道(channel)值，比如图片里的R、G、B三通道。`batch_size`和`in_channel`、`out_channel`定义于代码的开头。
 
+> `in_channel`即为输入的通道数，Filter（多通道的卷积核）的`in_channel`需要和输入保持一致。每个 Filter 与输入产生一个二维的输出。`out_channel`即为输出的通道数，其值实际上就是 Filter 的数量，`out_channel`个 Filter 与输入进行卷积运算，产生`out_channel`个通道的结果。
+>
+> ![conv](img/conv.png)
+>
+> > 图片上经过卷积计算，输出的尺寸变小了，而我们的实验中是为输入加上了值为0的 padding ，所以输入和输出的二维尺寸是一致的。
+
 代码中的注释和变量名遵循以下习惯：
 
 - 输入输出张量的尺寸: `size`, `H`, `W`
@@ -106,9 +112,9 @@ MEM[8]    MEM[9]    MEM[10]   MEM[11]
 - Kernel: `KH x KW x CI x CO`
 - Output: `N x H x W x CO`
 
-二维卷积计算的 CPU 版本已在 `conv.cu` 中的`conv2d_cpu_kernel`给出，用以验证正确性。即通过批、输入通道、输出通道、卷积核高、卷积核宽的五层循环轮流计算结果矩阵中每个位置的值。其中做了padding的0填充等处理。
+二维卷积计算的 CPU 版本已在 `conv.cu` 中的`conv2d_cpu_kernel`给出，用以验证正确性。即通过批、输入通道、输出通道、卷积核高、卷积核宽的五层循环轮流计算结果矩阵中每个位置的值。其中做了 padding 的0填充等处理。
 
-> **注意：**由于正确性验证中用到了OpenMP，它自动检测到的CPU核心数并不正确，可能会远超出aistation实际分配能调用的核心数，导致速度异常缓慢。因此，你需要设置环境变量：
+> **注意：**由于正确性验证中用到了 OpenMP，它自动检测到的 CPU 核心数并不正确，可能会远超出 aistation 实际分配能调用的核心数，导致速度异常缓慢。因此，你需要设置环境变量：
 >
 > ```shell
 > export OMP_NUM_THREADS=4
@@ -151,7 +157,7 @@ __global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a,
 
 ### 4.2 Shared Memory
 
-正如课上所讲，GPU 中有一块共享内存被同一线程块中的线程共享，在存储层级中，Shared Memory与L1 Cache同级，部分GPU架构中还可以手动分配L1 Cache与Shared Memory的大小；利用Shared Memory将线程块的密集访存加速能够获得极低的访存延迟且大大节省内存带宽。
+正如课上所讲，GPU 中有一块共享内存被同一线程块中的线程共享，在存储层级中，Shared Memory 与 L1 Cache 同级，部分 GPU 架构中还可以手动分配 L1 Cache 与 Shared Memory 的大小；利用 Shared Memory 将线程块的密集访存加速能够获得极低的访存延迟且大大节省内存带宽。
 
 <img src="img/shared_memory.png" alt="shared_memory" style="zoom: 40%;" />
 
@@ -165,7 +171,7 @@ __global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a,
 
 ### 4.4 Virtual Thread Split
 
-重新组织线程的编号方式与执行顺序(自由发挥)，尽可能的防止bank conflict，最大化利用显存带宽。
+重新组织线程的编号方式与执行顺序(自由发挥)，尽可能的防止 bank conflict，最大化利用显存带宽。
 
 为了提高线程读写带宽，GPU 中的共享内存会被划分成若干个 bank，理想状况下，各个线程同一时间访问的 bank 应该是不同的。
 
@@ -177,12 +183,12 @@ __global__ void conv2d_cuda_kernel(const uint8_t *__restrict__ a,
 
 如果程序遇到难以解决的正确性问题，不妨考虑两个关键词： `sync` 和 `atomic`。
 
-另外在我们本次实验提供的 GPU (RTX 2080Ti) 上，包含一个叫做 TensorCore 的硬件，它能够进一步加速卷积的计算， 在Cuda 9.0之后，你可以使用内嵌`PTX`汇编或者CUDA的C++扩展`nvcuda::wmma`的方式
+另外在我们本次实验提供的 GPU (RTX 2080Ti) 上，包含一个叫做 TensorCore 的硬件，它能够进一步加速卷积的计算， 在 Cuda 9.0 之后，你可以使用内嵌`PTX`汇编或者 CUDA 的 C++ 扩展`nvcuda::wmma`的方式
 来显式地调用Tensor Core来进行计算。
 
-Tensor Core能在一个周期内完成一个小矩阵乘法，因而提高计算效率，但是Tensor Core对作矩阵乘法的两个矩阵的形状要求比较高(例如4x4x4，8x8x8等)，你需要合理地对矩阵进行切分和对Wrap中的线程合理分配来发挥出Tensor Core的计算性能。了解如何调用Tensor Core，可以查阅文档尾部的参考文献。
+Tensor Core 能在一个周期内完成一个小矩阵乘法，因而提高计算效率，但是Tensor Core对作矩阵乘法的两个矩阵的形状要求比较高(例如4x4x4，8x8x8等)，你需要合理地对矩阵进行切分和对 Wrap 中的线程合理分配来发挥出 Tensor Core 的计算性能。了解如何调用 Tensor Core，可以查阅文档尾部的参考文献。
 
-使用Tensor Core完成本次lab，你将会获得Bonus。
+使用 Tensor Core 完成本次实验，你将会获得 Bonus。
 
 
 ## 5 实验初始代码
