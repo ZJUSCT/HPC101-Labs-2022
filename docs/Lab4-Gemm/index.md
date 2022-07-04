@@ -13,9 +13,15 @@
 
 ## 2 实验环境
 
+### 2.1 AI Station
+
 请大家在我们提供的集群上创建四个容器，每台容器包含四个 CPU 核心。大家需要配置好容器之间的网络通信以及 MPI 环境，操作方式与实验一相同，不过在本实验中出于方便起见，你可以直接使用包含 MPI 的 Docker 镜像，如之前实验中用过的 tensorflow 镜像。
 
-本实验额外提供了一个使用 `slurm` 管理的集群，上面已经安装好了 `IntelMPI` 套件，需要执行 `source /opt/intel/oneapi/setvars.sh` 加载环境。
+### 2.2 Slurm
+
+本实验额外提供了一个使用 `slurm` 管理的集群。集群的配置为四节点，每个节点有 48 个 CPU 核心
+
+#### 2.2.1 登录
 
 登录方式：`ssh <username>@clusters.zju.edu.cn -p 14514`
 
@@ -23,12 +29,37 @@
 
 对于部分缩写重名的同学，用户名略有不同，具体请查看 [username.txt](index.assets/username.txt)。
 
-集群的配置为四节点，每个节点有 48 个 CPU 核心。请使用 `slurm` 进行资源申请。
+#### 2.2.2 编译
 
-单次任务的最大运行时间为 10 分钟。在实验截止日期前一周，最大运行时间将会减少。
+集群上已经安装好了 `Intel OneAPI` 套件，需要执行 `source /opt/intel/oneapi/setvars.sh` 加载环境，其中包含了 `IntelMPI`。
+
+编译时请使用 `mpiicc` 或 `mpiicpc` 编译器。
+
+#### 2.2.3 运行
+
+在加载上述 `IntelMPI` 套件之后，可以使用下面几种方式运行程序（节点数和进程数请自行选择）：
+
+* 使用 `srun` 把任务提交至任务队列
+```bash
+I_MPI_PMI_LIBRARY=/usr/lib/x86_64-linux-gnu/libpmi.so.0 srun -N 4 -n 4 ./your_program
+```
+
+* 使用 `salloc` 请求集群资源，待资源分配完毕后手动运行
+```bash
+salloc -N 4
+# wait for a while
+mpirun -ppn 1 ./your_program
+```
+
+单次任务的最大运行时间为 10 分钟。**在实验截止日期前一周，最大运行时间将会减少。**
+
+#### 2.2.4 集群状态获取
+
+可以通过 `sinfo` 获取当前集群的状态，通过 `squeue` 获取排队的任务信息。如果当前自己的任务正在运行，则你可以通过 `ssh` 连接到各个计算节点通过 `htop` 等命令观察运行情况。
+
+### 2.3 集群选择
 
 **为避免阻塞，请尽量先在 aistation 上完成编写与调试。**
-
 
 
 ## 3 实验基础知识介绍
