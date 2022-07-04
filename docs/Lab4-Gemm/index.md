@@ -321,7 +321,7 @@ $$
 
 1. 独立完成本次实验，严禁抄袭，我们将会进行查重，一旦发现本次实验计 0 分。
 2. 攻击平台、恶意浪费节点资源等干扰他人的行为，以作弊论处。
-3. 只允许使用 OpenMP / OpenMPI / Intel MPI / Intel C Compiler / GNU Compiler Colletion 等， 不允许使用 Intel MKL / BLAS / LAPACK 等第三方工具库。若最终提交的代码使用禁止的库，以作弊论处。
+3. 只允许使用 OpenMP / Intel MPI / Intel C Compiler / GNU Compiler Colletion 等， 不允许使用 Intel MKL / BLAS / LAPACK 等第三方工具库。若最终提交的代码使用禁止的库，以作弊论处。
 4. 任何问题请联系群内助教。
 
 
