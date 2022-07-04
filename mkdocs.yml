@@ -6,7 +6,7 @@ nav:
   - Lab2-向量化计算: Lab2-Vectors/index.md
   - Lab2.5-Bonus 手写 SIMD 向量化: Lab2.5-Vectors-Bonus/index.md
   - Lab3-CUDA 使用基础: Lab3-Cuda/index.md
-  - Lab4-Gemm: Lab4-Gemm/index.md
+  - Lab4-GEMM 通用矩阵乘法: Lab4-Gemm/index.md
   - Lab5-深度神经网络训练与加速: Lab5-DL/index.md
 markdown_extensions:
   - pymdownx.arithmatex:
