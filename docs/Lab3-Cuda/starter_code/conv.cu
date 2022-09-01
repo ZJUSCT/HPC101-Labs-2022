@@ -19,6 +19,16 @@ const int out_channel = 128;
 #define a(_n, _x, _y, _c) a[(_n) * size * size * in_channel + (_x) * size * in_channel + (_y) * in_channel + (_c)]
 #define w(_x, _y, _ci, _co) w[(_x) * kernel * in_channel * out_channel + (_y) * in_channel * out_channel + (_ci) * out_channel + (_co)]
 #define b(_n, _x, _y, _c) b[(_n) * size * size * out_channel + (_x) * size * out_channel + (_y) * out_channel + (_c)]
+#define CUDA_CALL(func)                                         \
+  {                                                             \
+    cudaError_t e = (func);                                     \
+    if (!(e == cudaSuccess || e == cudaErrorCudartUnloading))   \
+    {                                                           \
+        fprintf(stderr, "CUDA: %s\n", cudaGetErrorString(e));   \
+	      abort();                                                \
+    }                                                           \
+  }
+
 
 /// \brief Generate [N, H, W, C] input tensor and [H, W, I, O] kernel tensor.
 void Generate(uint8_t *const a, uint8_t *const w) {
@@ -187,13 +197,13 @@ void conv_cuda(const uint8_t *const a, const uint8_t *const w, uint8_t *const b,
                cudaEvent_t *start_e, cudaEvent_t *stop_e) 
 {
   uint8_t *a_kernel, *w_kernel, *b_kernel;
-  cudaMalloc(&a_kernel, batch_size * size * size * in_channel * sizeof(uint8_t));
-  cudaMemcpy(a_kernel, a, batch_size * size * size * in_channel * sizeof(uint8_t),
-             cudaMemcpyHostToDevice);
-  cudaMalloc(&w_kernel, kernel * kernel * in_channel * out_channel * sizeof(uint8_t));
-  cudaMemcpy(w_kernel, w, kernel * kernel * in_channel * out_channel * sizeof(uint8_t),
-             cudaMemcpyHostToDevice);
-  cudaMalloc(&b_kernel, batch_size * size * size * out_channel * sizeof(uint8_t));
+  CUDA_CALL(cudaMalloc(&a_kernel, batch_size * size * size * in_channel * sizeof(uint8_t)));
+  CUDA_CALL(cudaMemcpy(a_kernel, a, batch_size * size * size * in_channel * sizeof(uint8_t),
+             cudaMemcpyHostToDevice));
+  CUDA_CALL(cudaMalloc(&w_kernel, kernel * kernel * in_channel * out_channel * sizeof(uint8_t)));
+  CUDA_CALL(cudaMemcpy(w_kernel, w, kernel * kernel * in_channel * out_channel * sizeof(uint8_t),
+             cudaMemcpyHostToDevice));
+  CUDA_CALL(cudaMalloc(&b_kernel, batch_size * size * size * out_channel * sizeof(uint8_t)));
   // Start Timer.
   cudaEventRecord(*start_e);
   // Run Conv2d Kernel,
@@ -201,14 +211,21 @@ void conv_cuda(const uint8_t *const a, const uint8_t *const w, uint8_t *const b,
   dim3 grid((size + block_size - 1) / block_size,
             (size + block_size - 1) / block_size);
   dim3 block(block_size, block_size);
+  // @note: you can also use CUDA API to launch a cuda kernel function,
+  // __host__ cudaError_t cudaLaunchKernel;
   conv2d_cuda_kernel<<<grid, block>>>(a_kernel, w_kernel, b_kernel);
+  cudaError_t kernel_err = cudaGetLastError();
+  if (kernel_err != cudaSuccess) {
+  	printf("CUDA Kernel: %s", cudaGetErrorString(kernel_err));
+	abort();
+  }
   cudaDeviceSynchronize();
   // Stop Timer
   cudaEventRecord(*stop_e);
   cudaEventSynchronize(*stop_e);
 
-  cudaMemcpy(b, b_kernel, batch_size * size * size * out_channel * sizeof(uint8_t),
-             cudaMemcpyDeviceToHost);
+  CUDA_CALL(cudaMemcpy(b, b_kernel, batch_size * size * size * out_channel * sizeof(uint8_t),
+             cudaMemcpyDeviceToHost));
   cudaFree(a_kernel);
   cudaFree(w_kernel);
   cudaFree(b_kernel);
