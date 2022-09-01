@@ -12,11 +12,25 @@
 
 ## 2 实验环境
 
-请大家在我们提供的集群上创建一个开发环境为 TensorFlow / Pytorch 的容器（要求最后在实验报告中展示环境基本信息），容器中含有 Nvidia GeForce RTX 2080 Ti 及 nvcc v10.1，无需自行配置。
+### 2.1 编译器加载
 
-下图为某个可能的环境基本信息：
+```
+. /opt/spack/share/spack/setup-env.sh
+spack load cuda@11.5.0 # 当然，你也可以选择别的 cuda 版本
+```
 
-![env_info](img/env_info.png)
+### 2.2 运行
+
+实验环境与 Lab 4 一致，请使用 GPU 这个 Partition，为防止看到的 GPU 数量不正常，请使用下列命令申请节点：
+
+``` bash
+srun -p GPU -N 1 --gres=gpu:1 --cpus-per-task=16 --pty bash
+```
+
+### 2.3 Profile
+
+* Nsight Compute 在 /opt/NVIDIA-Nsight-Compute-2022.2 下
+* Nsight System 在 `spack load cudnn` 后直接使用 `nsys` 即可
 
 ## 3 实验基础知识介绍
 
