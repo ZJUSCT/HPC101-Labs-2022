@@ -1,0 +1,1298 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.3">
+    
+    
+      
+        <title>Lab4-GEMM 通用矩阵乘法 - HPC101-Labs-2022</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6b80c2a2.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#gemm" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="HPC101-Labs-2022" class="md-header__button md-logo" aria-label="HPC101-Labs-2022" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            HPC101-Labs-2022
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lab4-GEMM 通用矩阵乘法
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="HPC101-Labs-2022" class="md-nav__button md-logo" aria-label="HPC101-Labs-2022" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    HPC101-Labs-2022
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab1-MiniCluster/" class="md-nav__link">
+        Lab1-简单集群搭建
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab2-Vectors/" class="md-nav__link">
+        Lab2-向量化计算
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab2.5-Vectors-Bonus/" class="md-nav__link">
+        Lab2.5-Bonus 手写 SIMD 向量化
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab3-Cuda/" class="md-nav__link">
+        Lab3-CUDA 使用基础
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Lab4-GEMM 通用矩阵乘法
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Lab4-GEMM 通用矩阵乘法
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1 实验简介
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2 实验环境
+  </a>
+  
+    <nav class="md-nav" aria-label="2 实验环境">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-ai-station" class="md-nav__link">
+    2.1 AI Station
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-slurm" class="md-nav__link">
+    2.2 Slurm
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Slurm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#221" class="md-nav__link">
+    2.2.1 登录
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#222" class="md-nav__link">
+    2.2.2 编译
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#223" class="md-nav__link">
+    2.2.3 运行
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#224" class="md-nav__link">
+    2.2.4 集群状态获取
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23" class="md-nav__link">
+    2.3 集群选择
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3 实验基础知识介绍
+  </a>
+  
+    <nav class="md-nav" aria-label="3 实验基础知识介绍">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    3.1 程序局部性
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32" class="md-nav__link">
+    3.2 计算机层次存储结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33" class="md-nav__link">
+    3.3 并行计算
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 并行计算">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#331-simd" class="md-nav__link">
+    3.3.1 SIMD
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#332" class="md-nav__link">
+    3.3.2 指令级并行
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#333" class="md-nav__link">
+    3.3.3 线程级并行
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#334" class="md-nav__link">
+    3.3.4 进程级并行
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-io" class="md-nav__link">
+    3.3 IO 与通信开销
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4 实验步骤
+  </a>
+  
+    <nav class="md-nav" aria-label="4 实验步骤">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41" class="md-nav__link">
+    4.1 单机优化
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 单机优化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411" class="md-nav__link">
+    4.1.1 基准
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#412" class="md-nav__link">
+    4.1.2 分块
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#413" class="md-nav__link">
+    4.1.3 向量化
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#414" class="md-nav__link">
+    4.1.4 数组封装
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#415" class="md-nav__link">
+    4.1.5 写入缓存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#416" class="md-nav__link">
+    4.1.6 线程级并行
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42" class="md-nav__link">
+    4.2 分布式并行
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    5 实验任务与要求
+  </a>
+  
+    <nav class="md-nav" aria-label="5 实验任务与要求">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51" class="md-nav__link">
+    5.1 问题描述
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52" class="md-nav__link">
+    5.2 评测环境
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53" class="md-nav__link">
+    5.3 基准代码
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54" class="md-nav__link">
+    5.4 评测方式
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55" class="md-nav__link">
+    5.5 计分方式
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56" class="md-nav__link">
+    5.6 作业提交方式
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    6 注意事项
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-bonus" class="md-nav__link">
+    7 Bonus
+  </a>
+  
+    <nav class="md-nav" aria-label="7 Bonus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71" class="md-nav__link">
+    7.1 实验任务
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72" class="md-nav__link">
+    7.2 实验要求
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    参考资料
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab5-DL/" class="md-nav__link">
+        Lab5-深度神经网络训练与加速
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1 实验简介
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2 实验环境
+  </a>
+  
+    <nav class="md-nav" aria-label="2 实验环境">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-ai-station" class="md-nav__link">
+    2.1 AI Station
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-slurm" class="md-nav__link">
+    2.2 Slurm
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Slurm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#221" class="md-nav__link">
+    2.2.1 登录
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#222" class="md-nav__link">
+    2.2.2 编译
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#223" class="md-nav__link">
+    2.2.3 运行
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#224" class="md-nav__link">
+    2.2.4 集群状态获取
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23" class="md-nav__link">
+    2.3 集群选择
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3 实验基础知识介绍
+  </a>
+  
+    <nav class="md-nav" aria-label="3 实验基础知识介绍">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    3.1 程序局部性
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32" class="md-nav__link">
+    3.2 计算机层次存储结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33" class="md-nav__link">
+    3.3 并行计算
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 并行计算">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#331-simd" class="md-nav__link">
+    3.3.1 SIMD
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#332" class="md-nav__link">
+    3.3.2 指令级并行
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#333" class="md-nav__link">
+    3.3.3 线程级并行
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#334" class="md-nav__link">
+    3.3.4 进程级并行
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-io" class="md-nav__link">
+    3.3 IO 与通信开销
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4 实验步骤
+  </a>
+  
+    <nav class="md-nav" aria-label="4 实验步骤">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41" class="md-nav__link">
+    4.1 单机优化
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 单机优化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411" class="md-nav__link">
+    4.1.1 基准
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#412" class="md-nav__link">
+    4.1.2 分块
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#413" class="md-nav__link">
+    4.1.3 向量化
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#414" class="md-nav__link">
+    4.1.4 数组封装
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#415" class="md-nav__link">
+    4.1.5 写入缓存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#416" class="md-nav__link">
+    4.1.6 线程级并行
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42" class="md-nav__link">
+    4.2 分布式并行
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    5 实验任务与要求
+  </a>
+  
+    <nav class="md-nav" aria-label="5 实验任务与要求">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51" class="md-nav__link">
+    5.1 问题描述
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52" class="md-nav__link">
+    5.2 评测环境
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53" class="md-nav__link">
+    5.3 基准代码
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54" class="md-nav__link">
+    5.4 评测方式
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55" class="md-nav__link">
+    5.5 计分方式
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56" class="md-nav__link">
+    5.6 作业提交方式
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    6 注意事项
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-bonus" class="md-nav__link">
+    7 Bonus
+  </a>
+  
+    <nav class="md-nav" aria-label="7 Bonus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71" class="md-nav__link">
+    7.1 实验任务
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72" class="md-nav__link">
+    7.2 实验要求
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    参考资料
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+<h1 id="gemm">实验四：GEMM 通用矩阵乘法</h1>
+<h2 id="1">1 实验简介</h2>
+<p><strong>BLAS</strong>（英语：<strong>Basic Linear Algebra Subprograms</strong>，基础线性代数程序集）是一个<a href="https://zh.wikipedia.org/wiki/应用程序接口">应用程序接口</a>（API）标准，用以规范发布基础线性代数操作的数值库（如矢量或矩阵乘法）。该程序集最初发布于 1979 年，并用于创建更大的数值程序包（如 <a href="https://zh.wikipedia.org/wiki/LAPACK">LAPACK</a>）。[1] 在高性能计算领域，BLAS 被广泛使用，numpy 的底层也依赖于 BLAS。</p>
+<p>通用矩阵乘法（<a href="https://en.wikipedia.org/wiki/General_matrix_multiply">General matrix multiply</a>, GEMM）是 BLAS 中经典的子程序之一。[2] 作为当今科学计算最常见的计算任务之一，GEMM 需要实现一个非常高效的矩阵乘法。优化 GEMM 也是 HPC 界非常基础的任务。</p>
+<p>本次实验需要你使用 OpenMP、MPI 等 API 手工完成一个支持分布式计算高性能 GEMM 实现。</p>
+<h2 id="2">2 实验环境</h2>
+<h3 id="21-ai-station">2.1 AI Station</h3>
+<p>请大家在我们提供的集群上创建四个容器，每台容器包含两个 CPU 核心。大家需要配置好容器之间的网络通信以及 MPI 环境，操作方式与实验一相同，不过在本实验中出于方便起见，你可以直接使用包含 MPI 的 Docker 镜像，如之前实验中用过的 tensorflow 镜像。</p>
+<h3 id="22-slurm">2.2 Slurm</h3>
+<p>本实验额外提供了一个使用 <code>slurm</code> 管理的集群。集群的配置为四节点，每个节点有 48 个 CPU 核心</p>
+<h4 id="221">2.2.1 登录</h4>
+<p>登录方式：<code>ssh &lt;username&gt;@clusters.zju.edu.cn -p 14514</code></p>
+<p>其中 <code>username</code> 为 <code>{你的姓名缩写}-summer</code> ，例：王小明的用户名为 <code>wxm-summer</code>。</p>
+<p>对于部分缩写重名的同学，用户名略有不同，具体请查看 <a href="index.assets/username.txt">username.txt</a>。</p>
+<h4 id="222">2.2.2 编译</h4>
+<p>集群上已经安装好了 <code>Intel OneAPI</code> 套件，需要执行 <code>source /opt/intel/oneapi/setvars.sh</code> 加载环境，其中包含了 <code>IntelMPI</code>。</p>
+<p>编译时请使用 <code>mpiicc</code> 或 <code>mpiicpc</code> 编译器。</p>
+<h4 id="223">2.2.3 运行</h4>
+<p>在加载上述 <code>IntelMPI</code> 套件之后，可以使用下面几种方式运行程序（节点数和进程数请自行选择）：</p>
+<ul>
+<li>
+<p>使用 <code>srun</code> 把任务提交至任务队列
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">I_MPI_PMI_LIBRARY</span><span class="o">=</span>/usr/lib/x86_64-linux-gnu/libpmi.so.0 srun -N <span class="m">4</span> -n <span class="m">4</span> ./your_program
+</code></pre></div></p>
+</li>
+<li>
+<p>使用 <code>salloc</code> 请求集群资源，待资源分配完毕后手动运行
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>salloc -N <span class="m">4</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># wait for a while</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>mpirun -ppn <span class="m">1</span> ./your_program
+</code></pre></div></p>
+</li>
+</ul>
+<p>单次任务的最大运行时间为 10 分钟。<strong>在实验截止日期前一周，最大运行时间将会减少。</strong></p>
+<h4 id="224">2.2.4 集群状态获取</h4>
+<p>可以通过 <code>sinfo</code> 获取当前集群的状态，通过 <code>squeue</code> 获取排队的任务信息。如果当前自己的任务正在运行，则你可以通过 <code>ssh</code> 连接到各个计算节点通过 <code>htop</code> 等命令观察运行情况。</p>
+<h3 id="23">2.3 集群选择</h3>
+<p><strong>为避免阻塞，请尽量先在 aistation 上完成编写与调试。</strong></p>
+<h2 id="3">3 实验基础知识介绍</h2>
+<h3 id="31">3.1 程序局部性</h3>
+<blockquote>
+<p>此部分介绍参考自 <a href="https://en.wikipedia.org/wiki/Locality_of_reference">wiki</a></p>
+</blockquote>
+<p>程序局部性指的是应用程序在访问内存的时候，倾向于访问内存中较为靠近的值。</p>
+<p>一般来说，程序的局部性分为两种形式，一种是时间局部性，另一种是空间局部性。时间局部性指的是，程序在运行时，最近刚刚被引用过的一个内存位置容易再次被引用，比如在调取一个函数的时候，前不久才调取过的本地参数容易再度被调取使用。空间局部性指的是，最近引用过的内存位置以及其周边的内存位置容易再次被使用。空间局部性比较常见于循环中，比如在一个数列中，如果第 3 个元素在上一个循环中使用，则本次循环中极有可能会使用第 4 个元素。</p>
+<p>局部性是出现在计算机系统中的一种可预测行为。系统的这种强访问局部性，可以被用来在处理器内核的指令流水线中进行性能优化，如缓存，内存预读取以及分支预测。</p>
+<h3 id="32">3.2 计算机层次存储结构</h3>
+<p>存储层次是在计算机体系结构下存储系统层次结构的排列顺序。每一层于下一层相比都拥有较高的速度和较低延迟性，以及较小的容量。</p>
+<p><img src="index.assets/v2-37cd14433f0a64844ccd435f3b48b236_r.jpg" alt="preview" style="zoom:50%;" /></p>
+<p>层次存储的设计核心目的就是要充分利用程序的局部性，如将最常访问的数据放置在较高的层级来保证访问速度；再比如按照顺序访问能够使得每次取来的整块数据都能够被利用，也使得预取的数据是有效的；如果你的内存充足，你甚至可以将硬盘上的数据提前拷贝到内存，来避免硬盘 I/O 带来的开销，等等。</p>
+<p>因此，充分优化一个程序的局部性，能够使得其充分利用现代计算机硬件上各种加速设计，提高其运行效率。</p>
+<h3 id="33">3.3 并行计算</h3>
+<h4 id="331-simd">3.3.1 SIMD</h4>
+<p><img alt="img" src="index.assets/225px-SIMD.svg.png" /></p>
+<p>SIMD 是一种数据并行技术，它通过提供支持向量运算的指令，同时对一组数据执行相同的计算，从而实现空间上的并行，进而提高程序的并行度和吞吐量。当程序中出现大量完全一致的运算需要对一批数据进行处理时，你可以考虑使用 SIMD 对其进行并行。</p>
+<h4 id="332">3.3.2 指令级并行</h4>
+<p><img src="index.assets/image-20220703230249870.png" alt="pipeline" style="zoom:50%;" /></p>
+<p>现代处理器一般都会使用流水线技术来同时执行多条指令的不同阶段，从而实现指令间的并行。传统流水线因为需要解决流水线中的各种冲突，不可避免的会在流水线中带来空泡，而由于现代处理器里其实还包含指令的乱序发射，出现空泡的几率已经大大降低，所以在编程时不太需要考虑这方面的问题。</p>
+<h4 id="333">3.3.3 线程级并行</h4>
+<p>前面介绍的并行都是对于单个物理核心的场景，在现代计算机中，我们往往拥有多个物理核心，而线程作为调度的最小单位只能在一个核心上执行，因此我们需要开启多个线程来充分利用每一个核心。</p>
+<p>线程的一个好处是内存共享，这意味着线程间的通信开销会小不少。因此在单机上我们往往采用多线程的并行模型。不过为了保证计算的正确性，你需要确保一些地方的操作是原子的，并维护好一些同步点。</p>
+<h4 id="334">3.3.4 进程级并行</h4>
+<p>对于分布式的计算来说，仅仅使用线程并行已经不够了。我们需要在每个节点上开启不同的进程，来激发更多的并行能力。由于进程间的内存并不共享，我们需要进程间通信来进行数据的分享。</p>
+<h3 id="33-io">3.3 IO 与通信开销</h3>
+<p>如果程序有 IO 或者网络通信需求，而我们程序的根本需求其实是计算，所以想办法缩短这一部分的时间也是提高程序性能的重要手段：比如减少通信量，尽量将通信 / IO集中在一起，增加网络 / IO 的带宽等。</p>
+<h2 id="4">4 实验步骤</h2>
+<p>接下来我们讨论的优化技巧全部是针对两个稠密矩阵的乘法。我们给出以下形式化定义：</p>
+<p>给定矩阵 <span class="arithmatex">\(A, B, C\)</span>：</p>
+<div class="arithmatex">\[
+\mathbf{A} =\begin{pmatrix}a_{11}&amp;a_{12}&amp;\cdots &amp;a_{1n}\\a_{21}&amp;a_{22}&amp;\cdots &amp;a_{2n}\\\vdots &amp;\vdots &amp;\ddots &amp;\vdots \\a_{m1}&amp;a_{m2}&amp;\cdots &amp;a_{mn}\\\end{pmatrix}, \quad
+\mathbf {B} =\begin{pmatrix}b_{11}&amp;b_{12}&amp;\cdots &amp;b_{1p}\\b_{21}&amp;b_{22}&amp;\cdots &amp;b_{2p}\\\vdots &amp;\vdots &amp;\ddots &amp;\vdots \\b_{n1}&amp;b_{n2}&amp;\cdots &amp;b_{np}\\\end{pmatrix}, \quad
+\mathbf {C} =\begin{pmatrix}c_{11}&amp;c_{12}&amp;\cdots &amp;c_{1p}\\c_{21}&amp;c_{22}&amp;\cdots &amp;c_{2p}\\\vdots &amp;\vdots &amp;\ddots &amp;\vdots \\c_{m1}&amp;c_{m2}&amp;\cdots &amp;c_{mp}\\\end{pmatrix}
+\]</div>
+<p>矩阵乘法 <span class="arithmatex">\(C = AB\)</span> 定义为对任意 <span class="arithmatex">\(c_{ij}\)</span> 有：</p>
+<div class="arithmatex">\[
+ c_{ij}=a_{i1}b_{1j}+a_{i2}b_{2j}+\cdots +a_{in}b_{nj}=\sum _{k=1}^{n}a_{ik}b_{kj}
+\]</div>
+<p>为了简化问题，我们假设所有的矩阵都是 <span class="arithmatex">\(N \times N\)</span> 的方阵。 </p>
+<h3 id="41">4.1 单机优化</h3>
+<p>下面我们选择介绍一些单机上的优化技术。</p>
+<h4 id="411">4.1.1 基准</h4>
+<p>最基础的矩阵乘法自然是三层循环，即对二维矩阵 <span class="arithmatex">\(<span class="arithmatex">\(C\)</span>\)</span> 的每一项通过单层循环计算其结果。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="n">C</span><span class="p">[(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">N</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">k</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">      </span><span class="n">C</span><span class="p">[(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">N</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">]</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">A</span><span class="p">[(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">N</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">B</span><span class="p">[(</span><span class="n">k</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">N</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">]</span><span class="w"></span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<h4 id="412">4.1.2 分块</h4>
+<p>基准代码尽可能多的使用了行遍历来提高内存的访问效率，但是即便如此，由于矩阵本身大小过大，导致部分按列访问的情况下，整体局部性还是不高。我们引入分块技术来进一步提高程序的局部性，降低 cache miss 的概率。</p>
+<div class="arithmatex">\[
+A=\left(\begin{array}{ccc}
+A_{0,0} &amp; \cdots &amp; A_{0, K-1} \\
+\vdots &amp; &amp; \vdots \\
+A_{M-1,0} &amp; \cdots &amp; A_{M-1, K-1}
+\end{array}\right), \quad B=\left(\begin{array}{ccc}
+B_{0,0} &amp; \cdots &amp; B_{0, N-1} \\
+\vdots &amp; &amp; \vdots \\
+B_{K-1,0} &amp; \cdots &amp; B_{K-1, N-1}
+\end{array}\right), \quad C=\left(\begin{array}{ccc}
+C_{0,0} &amp; \cdots &amp; C_{0, N-1} \\
+\vdots &amp; &amp; \vdots \\
+C_{M-1,0} &amp; \cdots &amp; C_{M-1, N-1}
+\end{array}\right)
+\]</div>
+<p>此时对于每一个 <span class="arithmatex">\(C\)</span>，我们都有：<span class="arithmatex">\(C_{ij}=\sum _{k=0}^{N-1}A_{ik}B_{kj}\)</span>
+大致代码实现如下：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">outerX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">outerX</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">outerX</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">outerY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">outerY</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">outerY</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="c1">// Clear C_ij matrix</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">innerX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">innerX</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">blockSize</span><span class="p">;</span><span class="w"> </span><span class="n">innerX</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">innerY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">innerY</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">blockSize</span><span class="p">;</span><span class="w"> </span><span class="n">innerY</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">        </span><span class="c1">// TODO: Clear C_ij matrix</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">      </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">K</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">K</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">K</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">      </span><span class="c1">// TODO: calculate C_ij = sum(A_ik * B_kj)</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>为了保证计算的正确性，你需要非常谨慎的处理循环层数、下标。</p>
+<h4 id="413">4.1.3 向量化</h4>
+<p>对于循环的最内层，如果我们将其展开，往往会发现类似下面的模式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">someIdx0</span><span class="p">]</span><span class="w"></span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">someIdx1</span><span class="p">]</span><span class="w"></span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">someIdx2</span><span class="p">]</span><span class="w"></span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">someIdx3</span><span class="p">]</span><span class="w"></span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">...</span><span class="w"></span>
+</code></pre></div>
+<p>这种规律、统一的计算非常适合使用 SIMD 指令进行计算。以计算 <span class="arithmatex">\(C_i = A_i * B_i\)</span> 为例，我们可以写出以下利用 AVX 指令的向量化代码：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">__m256d</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">N</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">N</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="n">N</span><span class="p">];</span><span class="w"></span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__mm256_mul_pd</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+</code></pre></div>
+<p>这段代码能够在一条 CPU 指令内完成 4 个 double 的乘法，从而大幅提高系统的计算性能。</p>
+<p>同样，为了保证计算的正确性，你需要非常谨慎的处理循环层数、地址。</p>
+<p>由于向量化指令集在不同厂商、不同型号的 CPU 上可能都是不同的，手写向量化的成本非常的高，因此我们往往<strong>直接使用编译器的自动向量化</strong>。具体开启方法请查阅不同平台上相关编译器的编译选项。</p>
+<h4 id="414">4.1.4 数组封装</h4>
+<p>数组封装是 GEMM 中的一个重要技术。简单来说就是即便使用了分块技术，B 中的访存顺序依然是不太连贯的——以 <span class="arithmatex">\(16 \times 16\)</span> 大小的矩阵为例，即便我们按照 <span class="arithmatex">\(4 \times 4\)</span> 进行分块，B 中的访存顺序仍然会是每 4 次线性访问遇到一次非线性访问，如下图上半部分所示。 </p>
+<p><img alt="img" src="index.assets/array-packing.png" /></p>
+<p>解决方案是：提前将 B 矩阵拆分成 4 个小矩阵，每个矩阵大小为 <span class="arithmatex">\(16 \times 4\)</span>。拆分后的每个矩阵内部是连续存放的，这样所有的访存操作都是顺序的了，如图中下半部分所示。</p>
+<h4 id="415">4.1.5 写入缓存</h4>
+<p>在之前体系结构概述的课程里，我们已经介绍过写入内存的时候，也是存在局部性的。虽然存在不同的缓存替换、写回策略，但是总体上顺序写入仍然是远远快于非线性的写入的。因此我们可以先创建一块写入缓存，用于按照计算顺序存放结果，再在计算全部结束后批量拷贝、调整到应有的顺序。</p>
+<h4 id="416">4.1.6 线程级并行</h4>
+<p>在优化完局部性后，我们开始考虑使用线程级并行。这里我们使用 OpenMP 即可，具体方法课上已经介绍。请注意线程间的负载均衡，并平衡调度开销。</p>
+<p>多线程里需要注意的一点是，由于 NUMA 的存在，跨片访问的开销将会非常的大，因此提高核的数据亲和性也非常重要，如将线程绑定到指定核心上，避免被 OS 调度到其他核心，以及一个核上的线程应当尽量只访问该核心所直连的内存区域。</p>
+<h3 id="42">4.2 分布式并行</h3>
+<p>单机优化完毕后，再考虑分布式系统的优化。我们使用 MPI 来处理线程间的通信，具体方法课上已经介绍。由于进程间内存空间是不共享的，计算所需的数据需要手工进行分发，你需要合理设计通信方式，避免过度的通信开销。另外，也不要忽略了同步开销。</p>
+<blockquote>
+<p>更多优化技巧可以参阅手册末尾的参考资料</p>
+</blockquote>
+<h2 id="5">5 实验任务与要求</h2>
+<p>利用以上技术完成 GEMM 分布式实现，用于完成以下计算任务：</p>
+<h3 id="51">5.1 问题描述</h3>
+<p>输入矩阵 <span class="arithmatex">\(A, B\)</span>，标量 <span class="arithmatex">\(n\)</span>，计算矩阵连乘积：
+$$
+\prod_{k=0}^nA+kB = A (A + B) (A+2B)\dots(A+nB)
+$$
+其中矩阵 <span class="arithmatex">\(A, B\)</span> 为随机生成的 <span class="arithmatex">\(10001 \times 10001\)</span> <code>signed int</code> 32 矩阵。出于方便起见无需考虑溢出。</p>
+<h3 id="52">5.2 评测环境</h3>
+<p><code>slurm</code> 集群，详见本手册第 2 节。</p>
+<h3 id="53">5.3 基准代码</h3>
+<p>我们将提供一份代码包（详见 <a href="https://github.com/ZJUSCT/HPC101-Labs-2022/tree/main/docs/Lab4-Gemm/code">starter_code</a>），包含正确性检验以及性能计算，形式如下。</p>
+<p><code>hw.h</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// mat_A, mat_B and result point to memory at least 10001*10001*4B </span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1">// n is the scalar and will be used to check your answer</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kt">void</span><span class="w"> </span><span class="nf">input</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">mat_A</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">mat_B</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kt">void</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<p><code>hw_baseline.cpp</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;hw.h&quot;</span><span class="cp"></span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kt">int</span><span class="w"> </span><span class="n">matA</span><span class="p">[</span><span class="mi">10001</span><span class="o">*</span><span class="mi">10001</span><span class="p">];</span><span class="w"></span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kt">int</span><span class="w"> </span><span class="n">matB</span><span class="p">[</span><span class="mi">10001</span><span class="o">*</span><span class="mi">10001</span><span class="p">];</span><span class="w"></span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="n">input</span><span class="p">(</span><span class="n">matA</span><span class="p">,</span><span class="w"> </span><span class="n">matB</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="c1">// do calculation here</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="n">output</span><span class="p">(</span><span class="n">matA</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>你可以使用 <code>make</code> 构建二进制程序，并使用 <code>make run</code> 运行你的二进制程序。</p>
+<h3 id="54">5.4 评测方式</h3>
+<p>我们使用每秒计算量 （Operations Per Second）来评价你的程序性能，其计算⽅法如下：</p>
+<div class="arithmatex">\[
+Ops = \frac{n}{T}C
+\]</div>
+<p>其中 <span class="arithmatex">\(C=10001^3+2\cdot10001^2\)</span> 为常量。</p>
+<h3 id="55">5.5 计分方式</h3>
+<p>作业满分 20 分。 </p>
+<ul>
+<li>若答案错误或未能在 10 分钟内给出 <span class="arithmatex">\(n = 1\)</span> 时的结果，视情况给 0〜5 分</li>
+<li>答案正确且⾄少在 10 分钟内给出 <span class="arithmatex">\(n=1\)</span> 时的结果，给 5 分</li>
+<li>剩余 15 分将按所有有效提交程序的每秒计算量 <span class="arithmatex">\(Ops\)</span> 排名给出，遵循正态分布</li>
+</ul>
+<h3 id="56">5.6 作业提交方式</h3>
+<p>请将最优的源代码、Makefile/CMakeLists.txt、运行参数（包括 slurm 命令与参数）、<span class="arithmatex">\(Ops\)</span> 值以及实验报告打包提交到学在浙大。 截止后，我们将检查源代码的合法性（是否抄袭、使用了违禁库等）并重新编译测试。</p>
+<h2 id="6">6 注意事项</h2>
+<ol>
+<li>独立完成本次实验，严禁抄袭，我们将会进行查重，一旦发现本次实验计 0 分。</li>
+<li>攻击平台、恶意浪费节点资源等干扰他人的行为，以作弊论处。</li>
+<li>只允许使用 OpenMP / Intel MPI / Intel C Compiler / GNU Compiler Colletion 等， 不允许使用 Intel MKL / BLAS / LAPACK 等第三方工具库。若最终提交的代码使用禁止的库，以作弊论处。</li>
+<li>任何问题请联系群内助教。</li>
+</ol>
+<h2 id="7-bonus">7 Bonus</h2>
+<p>本部分选做，感兴趣的同学可以尝试着完成。</p>
+<p>Bonus 部分完成即有加分（完成 Bonus 部分实验要求，且能够通过编译与测试），我们将根据完成质量提供 5-10 分的加分（与 Lab 4 权重相同）。</p>
+<h3 id="71">7.1 实验任务</h3>
+<p>Fortran 是世界上第一个被正式采用并流传至今的高级编程语言，它因较为容易学习而被大量用于科学计算领域的代码编写。其编译器往往会随 C/C++ 的编译器一同安装，且其编译流程和 C/C++ 类似，故其能和 C/C++ 程序进行混合编译。</p>
+<p>你需要完成的任务是，将上述实验内容使用 Fortran 重新实现，并能够和 C/C++ 代码实现混合编译（即在 Fortran 代码中调用 <code>hw.h</code> 中的  <code>input/output</code> 函数，编译生成一个由两种语言编写的二进制程序），通过 <code>output</code> 函数的测试。</p>
+<h3 id="72">7.2 实验要求</h3>
+<ol>
+<li>使用 Fortran 重新编写本实验，并实现混合编译</li>
+<li>测试实现的正确性和 <span class="arithmatex">\(Ops\)</span></li>
+<li>提交代码和简要的报告（可以附在 Lab 4 报告中）</li>
+</ol>
+<p>你可以直接使用 Fortran 进行 Lab 4 的编写并参与排名，一起获得 Lab 4 及 Bonus 的分数。</p>
+<p>你也可以同时提交使用 C/C++ 的实现和使用 Fortran 的实现，对比两种实现的结果，并注明使用哪个实现参与最终 Lab 4 的排名计算 Lab 4 的分数。此时建议将 Fortran 源码和 C/C++ 源码一并上交，并通过 Makefile/CMakeLists.txt 注明两种实现分别的构建与运行方式。</p>
+<h2 id="_1">参考资料</h2>
+<ol>
+<li><a href="https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms">https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms</a></li>
+<li><a href="https://en.wikipedia.org/wiki/General_matrix_multiply">https://en.wikipedia.org/wiki/General_matrix_multiply</a></li>
+<li><a href="https://github.com/flame/how-to-optimize-gemm/wiki">https://github.com/flame/how-to-optimize-gemm/wiki</a></li>
+<li><a href="https://tvm.apache.org/docs/tutorials/optimize/opt_gemm.html">https://tvm.apache.org/docs/tutorials/optimize/opt_gemm.html</a></li>
+<li>Huang J, van. BLISlab: A Sandbox for Optimizing GEMM. arXiv.org. Published 2016. Accessed July 10, 2021. https://arxiv.org/abs/1609.00076</li>
+<li><a href="https://missing-semester-cn.github.io/">计算机教育中缺失的一课 · the missing semester of your cs education (missing-semester-cn.github.io)</a></li>
+<li><a href="https://ourcodingclub.github.io/tutorials/fortran-intro/">Introduction to Fortran (ourcodingclub.github.io)</a></li>
+<li><a href="https://fortran-lang.org/learn/quickstart">Quickstart</a><a href="https://fortran-lang.org/learn/quickstart"> tutorial - Fortran Programming Language (fortran-lang.org)</a></li>
+</ol>
+
+
+
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../Lab3-Cuda/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Lab3-CUDA 使用基础" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Lab3-CUDA 使用基础
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../Lab5-DL/" class="md-footer__link md-footer__link--next" aria-label="Next: Lab5-深度神经网络训练与加速" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Lab5-深度神经网络训练与加速
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.2ab50757.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

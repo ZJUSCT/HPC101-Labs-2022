@@ -1,0 +1,991 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.3">
+    
+    
+      
+        <title>Lab1-简单集群搭建 - HPC101-Labs-2022</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6b80c2a2.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="HPC101-Labs-2022" class="md-header__button md-logo" aria-label="HPC101-Labs-2022" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            HPC101-Labs-2022
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lab1-简单集群搭建
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="HPC101-Labs-2022" class="md-nav__button md-logo" aria-label="HPC101-Labs-2022" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    HPC101-Labs-2022
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Lab1-简单集群搭建
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Lab1-简单集群搭建
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1 实验简介
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2 实验环境
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3 实验基础知识介绍
+  </a>
+  
+    <nav class="md-nav" aria-label="3 实验基础知识介绍">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    3.1 计算机集群
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 计算机集群">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#311" class="md-nav__link">
+    3.1.1 虚拟机
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#312-linux" class="md-nav__link">
+    3.1.2 Linux发行版
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-hpl" class="md-nav__link">
+    3.2 HPL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4 实验步骤
+  </a>
+  
+    <nav class="md-nav" aria-label="4 实验步骤">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-hypervisor-linux" class="md-nav__link">
+    4.1 下载 Hypervisor 和 Linux 光盘映像文件
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 下载 Hypervisor 和 Linux 光盘映像文件">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411-hypervisor" class="md-nav__link">
+    4.1.1 Hypervisor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#412-linux" class="md-nav__link">
+    4.1.2 Linux 光盘映像文件
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42" class="md-nav__link">
+    4.2 搭建集群并安装相关程序
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 搭建集群并安装相关程序">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#421" class="md-nav__link">
+    4.2.1 创建虚拟机
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#422-openmpi" class="md-nav__link">
+    4.2.2 下载并安装 OpenMPI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#423-hpl" class="md-nav__link">
+    4.2.3 下载并安装 HPL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#424" class="md-nav__link">
+    4.2.4 克隆节点
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43" class="md-nav__link">
+    4.3 测试集群
+  </a>
+  
+    <nav class="md-nav" aria-label="4.3 测试集群">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#431-ping" class="md-nav__link">
+    4.3.1 ping
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#432-ssh" class="md-nav__link">
+    4.3.2 配置 ssh
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#433-mpirun" class="md-nav__link">
+    4.3.3 mpirun
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    5 实验任务与要求
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab2-Vectors/" class="md-nav__link">
+        Lab2-向量化计算
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab2.5-Vectors-Bonus/" class="md-nav__link">
+        Lab2.5-Bonus 手写 SIMD 向量化
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab3-Cuda/" class="md-nav__link">
+        Lab3-CUDA 使用基础
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab4-Gemm/" class="md-nav__link">
+        Lab4-GEMM 通用矩阵乘法
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab5-DL/" class="md-nav__link">
+        Lab5-深度神经网络训练与加速
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1 实验简介
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2 实验环境
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3 实验基础知识介绍
+  </a>
+  
+    <nav class="md-nav" aria-label="3 实验基础知识介绍">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    3.1 计算机集群
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 计算机集群">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#311" class="md-nav__link">
+    3.1.1 虚拟机
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#312-linux" class="md-nav__link">
+    3.1.2 Linux发行版
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-hpl" class="md-nav__link">
+    3.2 HPL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4 实验步骤
+  </a>
+  
+    <nav class="md-nav" aria-label="4 实验步骤">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-hypervisor-linux" class="md-nav__link">
+    4.1 下载 Hypervisor 和 Linux 光盘映像文件
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 下载 Hypervisor 和 Linux 光盘映像文件">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411-hypervisor" class="md-nav__link">
+    4.1.1 Hypervisor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#412-linux" class="md-nav__link">
+    4.1.2 Linux 光盘映像文件
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42" class="md-nav__link">
+    4.2 搭建集群并安装相关程序
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 搭建集群并安装相关程序">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#421" class="md-nav__link">
+    4.2.1 创建虚拟机
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#422-openmpi" class="md-nav__link">
+    4.2.2 下载并安装 OpenMPI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#423-hpl" class="md-nav__link">
+    4.2.3 下载并安装 HPL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#424" class="md-nav__link">
+    4.2.4 克隆节点
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43" class="md-nav__link">
+    4.3 测试集群
+  </a>
+  
+    <nav class="md-nav" aria-label="4.3 测试集群">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#431-ping" class="md-nav__link">
+    4.3.1 ping
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#432-ssh" class="md-nav__link">
+    4.3.2 配置 ssh
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#433-mpirun" class="md-nav__link">
+    4.3.3 mpirun
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    5 实验任务与要求
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+<h1 id="_1">实验一：简单集群搭建</h1>
+<h2 id="1">1 实验简介</h2>
+<p>本次实验要求使用四台虚拟机搭建一个简易的集群，并对该集群进行性能测试，最后提交测试结果和实验报告。</p>
+<p>集群搭建的任务包括创建虚拟机、安装 Linux 发行版、配置网络和 ssh 通信。</p>
+<p>性能测试通过使用 OpenMPI 将 HPL 测试程序分配到四个虚拟机节点上执行。因此，需要下载并编译 OpenMPI、BLAS 和 HPL 的源代码，其中 OpenMPI、BLAS是 HPL 的依赖项。</p>
+<h2 id="2">2 实验环境</h2>
+<ul>
+<li>一台计算机，操作系统任意</li>
+<li>Hypervisor (本手册为 Virtual Box)</li>
+<li>虚拟机 * 4</li>
+</ul>
+<h2 id="3">3 实验基础知识介绍</h2>
+<h3 id="31">3.1 计算机集群</h3>
+<p><a href="https://en.wikipedia.org/wiki/Computer_cluster">计算机集群</a>是连接在一起、协同工作的一组计算机，集群中的每个计算机都是一个节点。在集群中，由软件将不同的计算任务（task）分配（schedule）到相应的一个或一群节点（node）上。本次实验中，需要使用 OpenMPI 将 HPL 程序作为 task 分配到集群中的四个节点上。</p>
+<h4 id="311">3.1.1 虚拟机</h4>
+<p>虚拟机为运行在其中的guest操作系统和应用提供了一个模拟的硬件环境，和真实的硬件保持一样的接口和表现，同时也如真实的硬件一样为其中的操作系统和程序提供保护机制、管理接口和资源限制。一个简易的非虚拟机和虚拟机结构的对比如下图（来源：Abraham Silberschatz, Peter Baer Galvin, Greg Gagn, <em>Operating System Concepts</em>, 10th edition, Chapter 18)</p>
+<p>一种常见的虚拟机机制实现方式便是通过 hypervisor（又称VMM: Virtual Machnie Manager）来为 guest 操作系统提供模拟硬件环境，这也为在一台物理机上运行多个虚拟机提供了可能。</p>
+<p>本手册中使用 Virtural Box 作为 hypervisor 进行示范和说明。</p>
+<p><img alt="" src="pics/image-20210714120624669.png" /></p>
+<h4 id="312-linux">3.1.2 Linux发行版</h4>
+<p>Linux 发行版（也被叫做 GNU/Linux 发行版），为一般用户预先集成好的 Linux 操作系统及各种应用 软件。一般用户不需要重新编译，在直接安装之后，只需要小幅度更改设置就可以使用，通常以软件包管理系统来进行应用软件的管理。Linux 发行版通常包含了包括桌面环境、办公包、媒体播放器、数据库等应用软件。这些操作系统通常由 Linux 内核、以及来自 GNU 计划的大量的函数库，和基于 X Window 的图形界面。现在有超过 300 个 Linux发行版。大部分都正处于活跃的开发中，不断地改进。由于大多数软件包是自由软件和开源软件，所以 Linux 发行版的形式多种多样——从功能齐全的桌面系统以及服务器系统到小型系统 (例如一些嵌入式设备)。除了一些定制软件 (如安装和配置工具)，发行版通常只是将特定的应用软件安装在一堆函数库和内核上，以满足特定用户的需求。</p>
+<p>这些发行版可以分为商业发行版，比如 Ubuntu（Canonical 公司）、Fedora（Red Hat）、openSUSE （Novell）和 Mandriva Linux；和社区发行版，它们由自由软件社区提供支持，如 Debian 和 Gentoo；也有发行版既不是商业发行版也不是社区发行版，如 Slackware。</p>
+<h3 id="32-hpl">3.2 HPL</h3>
+<p>HPL是一个可以在分布式系统上运行的解稠密线性系统的软件包，同时也可以被用来做高性能计算Linpack测试（High Performance Computing Linpack Benchmark）。</p>
+<p>关于HPL的详细介绍可参考 <a href="https://www.netlib.org/benchmark/hpl/">https://www.netlib.org/benchmark/hpl/</a></p>
+<blockquote>
+<p>The HPL software package <strong>requires</strong> the availibility on your system of an implementation of the Message Passing Interface <strong>MPI</strong> (1.1 compliant). An implementation of <strong>either</strong> the Basic Linear Algebra Subprograms <strong>BLAS or</strong> the Vector Signal Image Processing Library <strong>VSIPL</strong> is also needed. Machine-specific as well as generic implementations of <a href="https://www.netlib.org/benchmark/hpl/links.html#mpi_libs">MPI</a>, the <a href="https://www.netlib.org/benchmark/hpl/links.html#blas_libs">BLAS</a> and <a href="https://www.netlib.org/benchmark/hpl/links.html#vsip_libs">VSIPL</a> are available for a large variety of systems.</p>
+</blockquote>
+<p>HPL 需要系统中有 MPI 实现和 BLAS 实现，因此我们需要在安装 HPL 前在虚拟机中安装 OpenMPI 和 BLAS。</p>
+<p>OpenMPI 是一个开源的 <a href="http://www.mpi-forum.org/">Message Passing Interface</a> 实现，由一些科研机构和企业一起开发和维护。MPI 是一套标准化、可移植的消息传递标准，它被设计用于支持并行计算系统的架构，使得开发者能够方便地开发可移植的消息传递程序。同时，MPI 编程能力在高性能计算的实践与学习中也是非常基础的技能。</p>
+<p>BLAS 是 Basic Linear Algebra Subprograms 的缩写，本手册只要求将其作为 HPL 的依赖项下载安装即可，无需过多了解。</p>
+<h2 id="4">4 实验步骤</h2>
+<h3 id="41-hypervisor-linux">4.1 下载 Hypervisor 和 Linux 光盘映像文件</h3>
+<h4 id="411-hypervisor">4.1.1 Hypervisor</h4>
+<p>在创建虚拟机之前，你需要先准备好 Hypervisor，在本手册中，我们以 Virtual Box 为例，其他的 Hypervisor 请自行参阅相关材料：</p>
+<ul>
+<li>
+<p><a href="https://www.virtualbox.org/wiki/Downloads">Virtual Box 官网下载</a>：</p>
+<p><img alt="Virtual Box 官网" src="pics/01.png" /></p>
+<blockquote>
+<p>注意<strong>不要选错宿主机平台</strong>！</p>
+</blockquote>
+</li>
+<li>
+<p>Docker</p>
+<p>由于本次实验希望大家从裸机手工完成完整的集群配置，包括网络和系统软件环境等，因此本次实验不推荐大家使用 Docker，如果学有余力可以尝试使用 Docker 复现本次实验，作为加分项（虚拟机为必做）。</p>
+</li>
+</ul>
+<h4 id="412-linux">4.1.2 Linux 光盘映像文件</h4>
+<p>本手册所使用的范例发行版是 Debian 11，同学可根据自己的喜好和经验挑选适合的发行版。
+Debian 下载点（如果网速问题可访问国内镜像）：</p>
+<ul>
+<li><a href="https://mirrors.zju.edu.cn/debian-cd/current-live/amd64/iso-hybrid/">ZJU Mirror</a></li>
+<li><a href="https://mirrors.tuna.tsinghua.edu.cn/debian-cd/current-live/amd64/iso-hybrid/">Tuna Mirror</a></li>
+<li><a href="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/">Official Mirror</a></li>
+</ul>
+<p><img alt="Debian 下载" src="pics/02.png" /></p>
+<blockquote>
+<p>花花绿绿的映像，该怎么选择好呢？图中带有 mate 字眼的映像代表附有 mate 桌面，为了最精简安装，本手册采 standard 版本（不含桌面）。</p>
+</blockquote>
+<ul>
+<li>
+<p>不推荐使用的光盘映像</p>
+<ul>
+<li>
+<p>从互联网下载 (关键字：Install via Internet / netinstall)</p>
+<p>此类镜像是在安装过程中访问互联网下载需要的包，由于虚拟机可能无法访问互联网，部分镜像虽然体积小但缺少很多重要的命令，因此不要挑选此类镜像。</p>
+</li>
+<li>
+<p>带有桌面环境的光盘映像 (关键字：Desktop / 以及后面带有 gnome, kde, lxde 等词的映像)</p>
+<p>如果计算机上的磁盘空间较不充足，建议不要下载带有桌面环境的光盘映像，如果你偏好桌面且空间足够可以忽略。</p>
+</li>
+<li>
+<p>你不熟悉的光盘映像 / 没有图形界面(GUI)安装程序的光盘映像</p>
+<p>Linux 发行版相当多，不熟悉或没使用过 Linux 的同学建议参考本手册，相信自己已经有一定基础的同学可以忽略。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="42">4.2 搭建集群并安装相关程序</h3>
+<h4 id="421">4.2.1 创建虚拟机</h4>
+<p>准备好 Hypervisor 跟 光盘映像后，就可以着手安装一个虚拟机了，请参考 Virtual Box 手册和相关教程。</p>
+<ul>
+<li>
+<p>选择发行版、内存、磁盘空间</p>
+<p><img src="pics/03.jpg" alt="Step1-1" style="zoom:50%;" />
+<img src="pics/04.jpg" alt="Step1-2" style="zoom:50%;" /></p>
+<p>选择自己要安装的发行版（如果没有直接选 Linux 即可），内存和磁盘空间根据实际情况分配。</p>
+</li>
+<li>
+<p>插入发行版映像文件和配置网络</p>
+<p><img src="pics/05.jpg" alt="Step2-1" style="zoom:50%;" /></p>
+<p>选取刚下载的映像文件。</p>
+<p><img src="pics/06.jpg" alt="Step2-2" style="zoom:50%;" /></p>
+<p>网络对虚拟机来说十分复杂，如果你不熟悉相关的名词，在一台虚拟机的情况下，直接默认的 NAT 即可。选择 NAT 的另一个好处是，因为手册需要节点间彼此互连，因此使用 NAT Network 的同时，所有节点也可访问互联网。</p>
+<p>不需要互联网或者使用有线网的同学也可以考虑使用 Bridged 或 Internal Network，具体请参考手册上的说明：<a href="https://www.virtualbox.org/manual/ch06.html">Virtual Networking</a>。</p>
+<blockquote>
+<p>小贴士
+- 如果你的虚拟机无法连上网，可能是宿主机的问题，请<strong>排查宿主机的网络状况</strong>。
+- 由于学校的网络情况，在学校中使用虚拟机的同学还是<strong>以 NAT Network 为主</strong>较方便。</p>
+</blockquote>
+</li>
+<li>
+<p>进入图形安装程序</p>
+<p>在启动虚拟机后，不要直接进入 Live CD，直接进入安装程序，照着引导走即可。</p>
+<p><img alt="Step3-1" src="pics/07.jpg" /></p>
+</li>
+<li>
+<p>安装完成并重启</p>
+<p>在刚刚插入映像文件的地方取消选取映像文件，否则下次重启时还会进入 Live CD。</p>
+</li>
+</ul>
+<h4 id="422-openmpi">4.2.2 下载并安装 OpenMPI</h4>
+<p>由于系统中的包通常比较旧，因此我们从 OpenMPI 的官网中下载最新版本源码自行编译安装：<a href="https://www.open-mpi.org/software/ompi/v4.1/">OpenMPI 下载</a>。</p>
+<blockquote>
+<p>小贴士
+- 在虚拟机<strong>可联网</strong>的环境下，可直接使用 <code>wget</code> 或 <code>curl</code> 来下载，会方便许多。
+- 在编译前，先了解 <code>make</code> 和 <code>autoconf</code>，可以减少不少除错时间。</p>
+</blockquote>
+<ul>
+<li>
+<p>修改 <code>PATH</code> 和 <code>LD_LIBRARY_PATH</code></p>
+<p>请将找到 OpenMPI 二进制文件的目录加入 <code>PATH</code> 环境变量，OpenMPI 库的目录加入 <code>LD_LIBRARY_PATH</code> 环境变量。</p>
+</li>
+</ul>
+<h4 id="423-hpl">4.2.3 下载并安装 HPL</h4>
+<p>下载地址：<a href="https://netlib.org/benchmark/hpl/software.html">https://netlib.org/benchmark/hpl/software.html</a></p>
+<ul>
+<li>
+<p>BLAS</p>
+<p>HPL 的依赖除了一个 MPI 实现（在手册中是 OpenMPI）外，还需要一个 BLAS 实现，我们可以从 netlib 下载<a href="https://www.netlib.org/blas/#_software">其中一个实现</a>，虽然没有优化过，但拿来测试已经足够了。</p>
+<ul>
+<li>
+<p>检查 <code>gcc</code> / <code>gfortran</code> 环境</p>
+<p>BLAS 需要 <code>gcc</code> / <code>gfortran</code> 来编译，请务必检查自己虚拟机中编译器是否存在及其版本。</p>
+</li>
+<li>
+<p>编译 BLAS/CBLAS</p>
+<p>先编译 BLAS，再参考 <code>README</code> 和 <code>INSTALL</code> 修改 CBLAS 的 Makefile 并编译 （需要 BLAS 的链接文件）。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>修改 HPL Makefile</p>
+<p>解压 HPL 压缩包后，在根目录的 <code>setup/</code> 文件夹下有 Makefile 相关文件的模板(Make.xxx，后缀代表架构)，复制到根目录并保存。</p>
+<p>参考 <code>README</code> ，根据自己情况修改以下参数：</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c"># Make.test</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c"># arch</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">ARCH</span> <span class="o">=</span> <span class="nb">test</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="err">...</span><span class="w"></span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c"># MPI</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nv">MPdir</span> <span class="o">=</span> /path/to/your/mpi/
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nv">MPinc</span> <span class="o">=</span> -I<span class="k">$(</span>MPdir<span class="k">)</span>/include64
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nv">MPlib</span> <span class="o">=</span> <span class="k">$(</span>MPdir<span class="k">)</span>/libmpi.so
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c"># BLAS</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nv">LAdir</span> <span class="o">=</span> /path/to/your/blas
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nv">LAinc</span> <span class="o">=</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nv">LAlib</span> <span class="o">=</span> <span class="k">$(</span>LAdir<span class="k">)</span>/lib
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="err">...</span><span class="w"></span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c"># compiler</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nv">CC</span> <span class="o">=</span> /path/to/your/mpicc
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nv">LINKER</span> <span class="o">=</span> <span class="k">$(</span>CC<span class="k">)</span>
+</code></pre></div>
+<p>&emsp;&emsp;修改当前目录下 <code>Make.top</code> 中的 <code>arch</code> 参数，需与 <code>Make.test</code> 中的一致。</p>
+<ul>
+<li>编译</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 替换成你自己的后缀</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>make <span class="nv">arch</span><span class="o">=</span><span class="nb">test</span>
+</code></pre></div>
+<h4 id="424">4.2.4 克隆节点</h4>
+<p>在 Virtual Box 中，克隆已经配置完成的节点成为集群中的其他节点，本手册范例中仅克隆一个（集群中两个节点），可克隆更多。</p>
+<h3 id="43">4.3 测试集群</h3>
+<h4 id="431-ping">4.3.1 ping</h4>
+<p><code>ping</code> 是测试节点网络连通性最为简单的方式，在进行其他测试前，请先确认能 <code>ping</code> 通所有节点。</p>
+<h4 id="432-ssh">4.3.2 配置 ssh</h4>
+<p><code>ssh</code> 是相当常用的，实现安全远程连接的方式，其原理和使用、配置方法请查阅相关参考资料：<a href="https://www.openssh.com/manual.html">Open SSH 网站</a>
+如果你没有 ssh 密钥，可以在其中一个节点创建一个：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ssh-keygen
+</code></pre></div>
+我们需要将自己的 ssh 公钥复制一份到另一个节点上的 <code>.ssh/authorized_keys</code> 中（可以利用 <code>ssh-copy-id</code> 命令来拷贝公钥，也可以直接使用 <code>nc</code> 将公钥作为文件传输）。复制完成后，注意检查 <code>authorized_keys</code> (600) 和 <code>.ssh/</code> (700) 目录的权限，否则无法顺利  <code>ssh</code>。</p>
+<ul>
+<li>
+<p>ssh passphrase</p>
+<p>如果自己的密钥有 passphrase，那么请使用 <code>ssh-agent</code> 确保能暂时不用输入 passphrase，以免之后影响 <code>mpirun</code> 正确运行。</p>
+</li>
+</ul>
+<h4 id="433-mpirun">4.3.3 mpirun</h4>
+<p>尽管对 OpenMPI 十分陌生，我们还是能利用它来跑非 MPI 的程序，同学可以编写简单的 Helloworld 程序来测试 OpenMPI，或者直接使用 Unix 命令。</p>
+<ul>
+<li>
+<p>OpenMPI hostfile</p>
+<p>两个节点都准备好后，我们可以试试 <code>mpirun</code> 了！按照如下格式，编写 MPI 的 hostfile 并保存：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>localhost slots=1
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>10.0.2.5  slots=1
+</code></pre></div>
+其中 slots 代表的意思是一个节点的 CPU 有多少核，由于我们创建虚拟机时仅分配一个核，因此这里的 slots 上限为 1 ，同学根据自己虚拟机的情况，修改 slots 的值。</p>
+</li>
+<li>
+<p>测试程序</p>
+<p>OpenMPI 需要测试程序为节点所共有或在节点上有相同路径，因为我们的第二个节点是克隆出来的，因此两个节点上的命令和 HPL 程序都会是相同路径，
+此时运行以下命令就能看到每个节点上线了多久：</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mpirun --hostfile myhostfile uptime
+</code></pre></div>
+<ul>
+<li>运行 HPL：</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mpirun --hostfile myhostfile ./xhpl
+</code></pre></div>
+<h2 id="5">5 实验任务与要求</h2>
+<ol>
+<li>搭建四个节点的虚拟机并记录过程，要求提供必要的截图或配置文件</li>
+<li>使用 OpenMPI 和 HPL 测试集群表现并记录结果</li>
+</ol>
+
+
+
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+      
+        
+        <a href="../Lab2-Vectors/" class="md-footer__link md-footer__link--next" aria-label="Next: Lab2-向量化计算" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Lab2-向量化计算
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.2ab50757.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

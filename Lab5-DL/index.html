@@ -1,0 +1,1107 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.3">
+    
+    
+      
+        <title>Lab5-深度神经网络训练与加速 - HPC101-Labs-2022</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6b80c2a2.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="HPC101-Labs-2022" class="md-header__button md-logo" aria-label="HPC101-Labs-2022" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            HPC101-Labs-2022
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lab5-深度神经网络训练与加速
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="HPC101-Labs-2022" class="md-nav__button md-logo" aria-label="HPC101-Labs-2022" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    HPC101-Labs-2022
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab1-MiniCluster/" class="md-nav__link">
+        Lab1-简单集群搭建
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab2-Vectors/" class="md-nav__link">
+        Lab2-向量化计算
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab2.5-Vectors-Bonus/" class="md-nav__link">
+        Lab2.5-Bonus 手写 SIMD 向量化
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab3-Cuda/" class="md-nav__link">
+        Lab3-CUDA 使用基础
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lab4-Gemm/" class="md-nav__link">
+        Lab4-GEMM 通用矩阵乘法
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Lab5-深度神经网络训练与加速
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Lab5-深度神经网络训练与加速
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1 实验简介
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2 实验环境
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3 实验基础知识介绍
+  </a>
+  
+    <nav class="md-nav" aria-label="3 实验基础知识介绍">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    3.1 网络模型
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 网络模型">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#311-cnn" class="md-nav__link">
+    3.1.1 CNN 卷积神经网络
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#312-lenet-5" class="md-nav__link">
+    3.1.2 LeNet-5
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#313-gpt" class="md-nav__link">
+    3.1.3 GPT
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32" class="md-nav__link">
+    3.2 数据集
+  </a>
+  
+    <nav class="md-nav" aria-label="3.2 数据集">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#321-mnist" class="md-nav__link">
+    3.2.1 MNIST 手写数字数据集
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#322-web-of-science" class="md-nav__link">
+    3.2.2 Web of Science 数据集
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4 实验步骤
+  </a>
+  
+    <nav class="md-nav" aria-label="4 实验步骤">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-lenet-5" class="md-nav__link">
+    4.1 LeNet-5 训练
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 LeNet-5 训练">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411" class="md-nav__link">
+    4.1.1 数据准备
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#412" class="md-nav__link">
+    4.1.2 模型编写
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1.2 模型编写">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4121" class="md-nav__link">
+    4.1.2.1 网络结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4122" class="md-nav__link">
+    4.1.2.2 损失函数
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4123" class="md-nav__link">
+    4.1.2.3 正向传播
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4124" class="md-nav__link">
+    4.1.2.4 反向传播
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4125" class="md-nav__link">
+    4.1.2.5 优化器
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#413" class="md-nav__link">
+    4.1.3 训练过程
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#414-tensorboard" class="md-nav__link">
+    4.1.4 TensorBoard
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#415-tips" class="md-nav__link">
+    4.1.5 Tips
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-gpt" class="md-nav__link">
+    4.2 GPT 训练与加速
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 GPT 训练与加速">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#421" class="md-nav__link">
+    4.2.1 文本数据预处理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#422" class="md-nav__link">
+    4.2.2 基准代码构建与加速
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#423" class="md-nav__link">
+    4.2.3 多卡训练
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#424" class="md-nav__link">
+    4.2.4 模型评分规模
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    5 实验任务与要求
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    参考资料
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1 实验简介
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2 实验环境
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3 实验基础知识介绍
+  </a>
+  
+    <nav class="md-nav" aria-label="3 实验基础知识介绍">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    3.1 网络模型
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 网络模型">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#311-cnn" class="md-nav__link">
+    3.1.1 CNN 卷积神经网络
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#312-lenet-5" class="md-nav__link">
+    3.1.2 LeNet-5
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#313-gpt" class="md-nav__link">
+    3.1.3 GPT
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32" class="md-nav__link">
+    3.2 数据集
+  </a>
+  
+    <nav class="md-nav" aria-label="3.2 数据集">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#321-mnist" class="md-nav__link">
+    3.2.1 MNIST 手写数字数据集
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#322-web-of-science" class="md-nav__link">
+    3.2.2 Web of Science 数据集
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4 实验步骤
+  </a>
+  
+    <nav class="md-nav" aria-label="4 实验步骤">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-lenet-5" class="md-nav__link">
+    4.1 LeNet-5 训练
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 LeNet-5 训练">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411" class="md-nav__link">
+    4.1.1 数据准备
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#412" class="md-nav__link">
+    4.1.2 模型编写
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1.2 模型编写">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4121" class="md-nav__link">
+    4.1.2.1 网络结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4122" class="md-nav__link">
+    4.1.2.2 损失函数
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4123" class="md-nav__link">
+    4.1.2.3 正向传播
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4124" class="md-nav__link">
+    4.1.2.4 反向传播
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4125" class="md-nav__link">
+    4.1.2.5 优化器
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#413" class="md-nav__link">
+    4.1.3 训练过程
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#414-tensorboard" class="md-nav__link">
+    4.1.4 TensorBoard
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#415-tips" class="md-nav__link">
+    4.1.5 Tips
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-gpt" class="md-nav__link">
+    4.2 GPT 训练与加速
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 GPT 训练与加速">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#421" class="md-nav__link">
+    4.2.1 文本数据预处理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#422" class="md-nav__link">
+    4.2.2 基准代码构建与加速
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#423" class="md-nav__link">
+    4.2.3 多卡训练
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#424" class="md-nav__link">
+    4.2.4 模型评分规模
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    5 实验任务与要求
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    参考资料
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+<h1 id="_1">实验五：深度神经网络训练与加速</h1>
+<h2 id="1">1 实验简介</h2>
+<p><strong>深度学习</strong>（Deep Learning）是<a href="https://zh.wikipedia.org/wiki/机器学习">机器学习</a>的分支，是一种以<a href="https://zh.wikipedia.org/wiki/人工神经网络">人工神经网络</a>为架构，对数据进行表征学习的<a href="https://zh.wikipedia.org/wiki/算法">算法</a>。深度学习能够取得如此卓越的成就，除了优越的算法、充足的数据，更离不开强劲的算力。近年来，深度学习相关的基础设施逐渐成熟，从网络设计时的训练、优化，到落地的推理加速，都有非常优秀的解决方案。其中，对于算力的需求最大的部分之一是网络的训练过程，它也因此成为 HPC 领域经常研究的话题。</p>
+<p><strong>卷积神经网络</strong>（Convolutional Neural Network, <strong>CNN</strong>）是一种<a href="https://zh.wikipedia.org/wiki/前馈神经网络">前馈神经网络</a>，对于大型图像处理有出色表现。</p>
+<p><strong>GPT</strong>（Generative Pre-trained Transformer）是一系列自回归语言模型，目的是为了使用深度学习分类或产生人类可以理解的自然语言。GPT 系列由在旧金山的人工智能公司 OpenAI 训练与开发，模型设计基于谷歌开发的 transformer。</p>
+<p>本次实验我们将完成 LeNet-5 和 GPT 模型的训练，并尝试使用各种优化技术加速训练过程。</p>
+<blockquote>
+<p>考虑到部分同学此前对于深度学习并没有很多了解，本次实验的 LeNet-5 部分主要目的为引导大家熟悉深度学习的流程，因此只需要完成即可得到分数，而 GPT 部分主要目的是引导大家尝试对于大型网络的训练进行优化，因此我们会根据模型的加速情况进行给分。</p>
+</blockquote>
+<h2 id="2">2 实验环境</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ssh <span class="m">10</span>.15.82.243 -p <span class="m">12222</span>
+</code></pre></div>
+<p>用户名与 Lab 4 相同。该集群也由 slurm 管理，可以使用 salloc 进行实验。集群自带 conda、pytorch、nvcc 等。集群各个节点的 home 目录是共享的，因此环境配置等可以在登录节点进行。</p>
+<p>集群具有两个队列，每个队列有两个单 GPU 节点。debug 队列用于调试，任务时长上限为 5 分钟。normal 队列用于收敛性验证及时间的评测，任务时长上限为 20 分钟。队列选择可在 salloc 时加入 -p 参数，如希望在 debug 队列上面进行单卡训练：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>srun -p debug -N <span class="m">1</span> --pty bash
+</code></pre></div>
+<p>任务时长上限到达时，请及时关闭任务并重新排队。如果发现节点 GPU 占用率异常，可以通过 htop 等命令观察情况，并通知助教杀死相应进程。</p>
+<h2 id="3">3 实验基础知识介绍</h2>
+<h3 id="31">3.1 网络模型</h3>
+<h4 id="311-cnn">3.1.1 CNN 卷积神经网络</h4>
+<p>卷积神经网络由一个或多个卷积层和顶端的全连通层（对应经典的神经网络）组成，同时也包括关联权重和池化层（pooling layer）。这一结构使得卷积神经网络能够利用输入数据的二维结构。与其他深度学习结构相比，卷积神经网络在图像和<a href="https://zh.wikipedia.org/wiki/语音识别">语音识别</a>方面能够给出更好的结果。这一模型也可以使用<a href="https://zh.wikipedia.org/wiki/反向传播算法">反向传播算法</a>进行训练。相比较其他深度、前馈神经网络，卷积神经网络需要考量的参数更少，使之成为一种颇具吸引力的深度学习结构。</p>
+<h4 id="312-lenet-5">3.1.2 LeNet-5</h4>
+<p>LeNet-5是一个较简单的卷积神经网络。下图显示了其结构：输入的二维图像，先经过两次卷积层到池化层，再经过全连接层，最后输出每种分类预测得到的概率。</p>
+<p><img alt="" src="index.assets/LeNet.jpg" /></p>
+<p>有关于其更详细的结构可以在<a href="http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf">原论文</a>中找到。</p>
+<h4 id="313-gpt">3.1.3 GPT</h4>
+<p>在自然语言处理（Natural language processing, NLP）中，早期使用的是循环神经网络（Recurrent Neural Network, <strong>RNN</strong>）。RNN 与 CNN 这样的前馈网络不同，RNN 中存在反馈和隐藏单元，使它可以「记住」之前读到的内容。为了解决深层网络中梯度消失或爆炸的问题，引入了长短期记忆（Long short-term memory, <strong>LSTM</strong>）。而为了解决传统 RNN 只能记住前面的问题，提出了双向的 LSTM。在此基础上引入的注意力机制（attention），使得网络能注意句子中重要位置的信息，例如允许在翻译中可以改变词语的顺序。</p>
+<p>不久后，研究者发现只靠注意力机制而无需 RNN 或 CNN，就能达到较好的效果，这就是 Transformer 模型。与 RNN 不同的是，Transformer 模型能够一次性处理所有输入数据。注意力机制可以为输入序列中的任意位置提供上下文。这种架构允许更高的并行度，并以此减少训练时间。</p>
+<p>以下为 Transformer 的结构：包含编码器和解码器，都由多个多头自注意力机制和全连接层堆叠而成，层间和层内存在归一化操作；输入由词嵌入向量加上位置信息得出。</p>
+<p><img alt="" src="index.assets/transformer.png" /></p>
+<p>Transformer 的详细结构可参考<a href="https://arxiv.org/abs/1706.03762">原论文</a>。</p>
+<p>2018 年，OpenAI 提出了生成预训练 Transformer 模型（Generative Pre-trained Transformer, <strong>GPT</strong>）。与先前基于监督式学习的 NLP 模型不同，GPT 在预训练生成阶段是无监督的（不需要标注），只在需要适应特定任务的<strong>微调</strong>（fine-tuning）时需要监督，降低了大规模 NLP 模型的门槛。GPT 的结构是 12 层仅包含解码器的 Transformer。一年后的 GPT-2 是对 GPT 的直接放大，参数量和数据集都增加了一个量级，参数量达到了 15 亿，取得了更好的效果和迁移学习能力。下一代的 GPT-3 达到了 1750 亿参数，生成的文章已经很难与人类写的区分出来。在一些领域，GPT-3 也<strong>不再需要</strong>专门的微调，而只需要提供例子等文本交互即可完成任务。大家可能熟悉的 GitHub Copilot 也是 GPT 的一个主要应用。GPT 系列模型的结构主要源于 Transformer 的 Encoder 部分。</p>
+<p>本次实验要求训练一个 GPT-2/3 结构的模型，具体模型结构请参阅 <a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">GPT-2</a> 和 <a href="https://arxiv.org/abs/2005.14165">GPT-3</a> 的原论文。</p>
+<h3 id="32">3.2 数据集</h3>
+<h4 id="321-mnist">3.2.1 MNIST 手写数字数据集</h4>
+<p>MNIST 数据集 (Mixed National Institute of Standards and Technology database) 是美国国家标准与技术研究院收集整理的大型手写数字数据库，包含 60,000 个示例的训练集以及 10,000 个示例的测试集。</p>
+<p><img src="index.assets/MNIST.jpeg" alt="How to Train a Model with MNIST dataset | by Abdullah Furkan Özbek | Medium" style="zoom:50%;" /></p>
+<p>MNIST 数据集下载：http://yann.lecun.com/exdb/mnist/index.html</p>
+<h4 id="322-web-of-science">3.2.2 Web of Science 数据集</h4>
+<p>Web of Science 是一个付费的文献元数据库，通过校网可以免费使用。该数据集原先用于文本层次化分类，由于我们采用的是无监督学习的预训练，因此不关心它给出的标签，只要用目录下的 X 文本训练。元数据目录（包含摘要和关键词）也可以忽略。</p>
+<p>数据集下载：https://data.mendeley.com/datasets/9rw3vkcfy4/6</p>
+<h2 id="4">4 实验步骤</h2>
+<h3 id="41-lenet-5">4.1 LeNet-5 训练</h3>
+<h4 id="411">4.1.1 数据准备</h4>
+<p>我们建议利用 <code>torchvision</code> 提供的 <code>torchvision.datasets</code> 方法导入数据，<code>torchvision.datasets</code> 所提供的接口十分方便，之后你可以用 <code>torch.utils.data.DataLoader</code> 给你的模型加载数据。</p>
+<p>此外，我们也欢迎你自定义你的 <code>Dataset</code> 类，这样做会给你带来额外的分数。为此，你需要继承 <code>torch.utils.data.Dataset</code> 并至少需要重写其中的 <code>__len__()</code> 和 <code>__getitem__()</code> 函数，<a href="https://pytorch.org/docs/stable/data.html">这里</a>有官方对 <code>torch.utils.data</code> 类的介绍，它或许可以帮到你。</p>
+<p>幸运的是，本次实验需要用到的 <code>MNIST</code> 数据集可用 <code>torchvision.datasets</code> 导入，下面对一些你可能会用到的参数简单加以说明</p>
+<p><strong>注意：请在清楚参数含义后调用它们</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># MNIST</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_transform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p>一些重要的参数说明：</p>
+<ul>
+<li>root: 在 <code>MNIST</code>中是 <code>processed/training.pt</code> 和 <code>processed/test.pt</code> 的主目录</li>
+<li>train: <code>True</code> 代表训练集，<code>False</code> 代表测试集</li>
+<li>transform 和 target_transform: 分别是对图像和 label 的转换操作</li>
+<li>download: 若为 <code>True</code> 则下载数据集并放到 <code>root</code> 所指定的目录中，否则直接尝试从 <code>root</code> 目录中读取</li>
+</ul>
+<p>你可以在<a href="https://pytorch.org/vision/0.8/datasets.html">这里</a>获取更加详细的说明</p>
+<h4 id="412">4.1.2 模型编写</h4>
+<h5 id="4121">4.1.2.1 网络结构</h5>
+<p><code>PyTorch</code> 提供了许多种定义模型的方式，最常用的一种是将网络结构以类保存，你应当首先继承 <a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module">torch.nn.Module</a>，并实现正向传播的 <code>forward</code> 函数，(为什么不用定义反向传播函数呢？因为你继承的 <code>nn.Module</code> 就是干这个事情的)。</p>
+<p>下面为网络结构的一个 sample（但显然这样的网络并不能用于本次 Lab），本次实验中你需要自定义你的网络结构，以完成我们的分类任务：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="nb">super</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span> <span class="c1"># 利用参数初始化父类</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</code></pre></div>
+<p>当然，你需要实例化你的模型，可以直接对模型打印以查看结构</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</code></pre></div>
+<p>网络结构编写中一个很大的难点在于每一步的 tensor shape 需要匹配，请仔细检查你的代码来确保此部分的正确性。</p>
+<h5 id="4122">4.1.2.2 损失函数</h5>
+<p>常见的损失函数都被定义在了 <code>torch.nn</code>中，你可以在训练过程开始前将其实例化，并在训练时调用，例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+</code></pre></div>
+<h5 id="4123">4.1.2.3 正向传播</h5>
+<p>正向传播是指对神经网络沿着从输入层到输出层的顺序，依次计算并存储模型的中间变量（包括输出）。
+正向传播的过程在 <code>forward</code>中定义，对于模型实例，可以直接利用输入输出得到模型预测的结果。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div>
+<h5 id="4124">4.1.2.4 反向传播</h5>
+<p>反向传播（Backpropagation，BP）是“误差反向传播”的简称，是一种与最优化方法（如梯度下降法）结合使用的，用来训练人工神经网络的常见方法。该方法对网络中所有权重计算损失函数的梯度。这个梯度会反馈给最优化方法，用来更新权值以最小化损失函数。</p>
+<p>在计算过模型的loss之后，可以利用 <code>loss.backward()</code> 计算反向传播的梯度，梯度会被直接储存在 <code>requires_grad=True</code> 的节点中，不过此时节点的权重暂时不会更新，因此可以做到梯度的累加。</p>
+<h5 id="4125">4.1.2.5 优化器</h5>
+<p>常用的优化器都被定义在了 <code>torch.optim</code> 中，为了使用优化器，你需要构建一个 optimizer 对象。这个对象能够保持当前参数状态并基于计算得到的梯度进行参数更新。你需要给它一个包含了需要优化的参数（必须都是 Variable 对象）的iterable。然后，你可以设置optimizer的参数选项，比如学习率，权重衰减，例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">([</span><span class="n">var1</span><span class="p">,</span> <span class="n">var2</span><span class="p">],</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span>
+</code></pre></div>
+<p>所有的optimizer都实现了step()方法，这个方法会更新所有的参数。或许你会在反向传播后用到它。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</code></pre></div>
+<p>需要注意的是，在反向传播前，如果你不希望梯度累加，请使用下面的代码将梯度清零。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+</code></pre></div>
+<h4 id="413">4.1.3 训练过程</h4>
+<p>前文中已经定义了网络结构、损失函数、优化器，至此，一个较为完整的训练过程如下，需要注意的是，你的训练过程要不断从 <code>DataLoader</code> 中取出数据。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30000</span><span class="p">):</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="c1"># Forward pass: Compute predicted y by passing x to the model</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="c1"># Compute and print loss</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    <span class="c1"># Zero gradients, perform a backward pass, and update the weights.</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</code></pre></div>
+<h4 id="414-tensorboard">4.1.4 TensorBoard</h4>
+<p>TensorBoard 是常用的训练过程可视化工具。请参考 <a href="https://pytorch.org/tutorials/recipes/recipes/tensorboard_with_pytorch.html">PyTorch</a> 的官方教程完成配置。</p>
+<h4 id="415-tips">4.1.5 Tips</h4>
+<ul>
+<li><code>nn.functional.ReLU</code>  （简记为 <code>F.ReLU</code> ）和 <code>nn.ReLU</code> 略有不同，区别在于前者作为一个函数调用，如 4.3.1 中所示，而后者作为一个层结构，必须添加到 <code>nn.Module</code> 容器中才能使用，两者实现的功能一样，在 <code>PyTorch</code> 中，<code>nn.X</code> 都有对应的函数版本 <code>F.X</code>。</li>
+<li>除了利用继承 <code>nn.Module</code> 来建立网络，不推荐但可以使用 <code>nn.ModuleList</code>, <code>nn.ModuleDict</code>，推荐使用 <code>nn.Sequential</code>直接定义模型</li>
+<li>你可以定义如下的 <code>device</code> 变量，以便你的模型在没有 GPU 环境下也可以测试：</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">some_data</span> <span class="o">=</span> <span class="n">some_data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li>相比于原生的 <code>PyTorch</code>，<code>PyTorch Lightning</code> 框架对其进行了更高层次的封装，很大程度上简化了模型定义、训练以及测试的步骤，使用 <code>PyTorch Lightning</code> 作为本次实验的加分项，官网链接已附在参考资料中。如果你能够在 TensorBoard 中将中间层可视化，你能得到更多的加分。</li>
+</ul>
+<h3 id="42-gpt">4.2 GPT 训练与加速</h3>
+<h4 id="421">4.2.1 文本数据预处理</h4>
+<p>预处理最主要的工作是分词（tokenize）。分词器将文本拆分成词，再转换成数字以供模型训练。由于句子长短不一，可能需要进行填充或截断，最后生成输入的张量。</p>
+<p>分词的粒度，最自然的是按<strong>单词划分</strong>，例如英语中根据空格和标点符号划分，但生成的词表会很大，增加存储和计算复杂度；另一个极端是按<strong>字母划分</strong>，虽然词表会很小，但模型很难学到有意义的内容；因此现在一般使用<strong>子词（subword）划分</strong>，在词表中保留较短的常用词，生僻词则用常用词拼接而成。</p>
+<p>常用的分词算法有字节对编码（Byte-Pair Encoding, <strong>BPE</strong>）、WordPiece、Unigram、SentencePiece 等，其中 GPT 用的是 BPE。BPE 从单个字母的词表开始，通过不断合并高频字母对，直到达到预定的词表大小。WordPiece 与 BPE 基本相同，合并策略有所区别。</p>
+<p>具体原理介绍可参考 <a href="https://huggingface.co/docs/transformers/tokenizer_summary">https://huggingface.co/docs/transformers/tokenizer_summary</a>，以及 <a href="https://cloud.tencent.com/developer/article/1865689">NLP BERT GPT等模型中 tokenizer 类别说明详解</a>。</p>
+<p>可以直接使用 <a href="https://huggingface.co/docs/transformers/preprocessing">huggingface 的预训练分词器</a>中提供的 GPT-2 tokenizer，如选择自己训练 vocab 可以获得 bonus。</p>
+<h4 id="422">4.2.2 基准代码构建与加速</h4>
+<p>请参考 3.1.3 中的模型结构描述完成基准代码的构建，并基于此进行训练加速。为了减轻工作量，此部分允许使用 huggingface transformer 等模型库，以及其他的分布式训练加速框架。但需要在报告里陈述你所采用的各项优化的原理、出发点和效果。注意本次实验中的 GPT 需要使用的是 GPT-2 的模型结构。</p>
+<h4 id="423">4.2.3 多卡训练</h4>
+<p>单张GPU的显存和算力是有限的，随着模型大小的增长，我们需要多张GPU一起参与训练以获得更大的显存和更高的算力。多卡训练Transformer模型时常见的并行策略有<strong>张量并行（Tensor Parallelism）</strong>、<strong>流水线并行（Pipeline Parallelism）</strong>和<strong>数据并行（Data Parallelism）</strong>。</p>
+<ul>
+<li>张量并行将模型层内的参数切分到不同设备进行计算,在Transformer中，注意和多层感知器(MLP)的张量在向前和向后计算时按行或列分割。
+  <img alt="" src="index.assets/Tensor-Parallelism.png" /></li>
+<li>流水线并行将模型不同的层切分到不同设备进行计算，流水线中的每一设备接受上一节点的结果，并把自己的结果传递给下一设备。
+  <img alt="" src="index.assets/Pipeline-Parallelism.png" /></li>
+<li>数据并行则将全局批次大小（global batch size）按照流水线分组进行分割，每个流水线组都包含模型的一个副本，数据在组内按照局部批次规模送入模型副本，最后将各组得到的梯度进行加权平均得到总的梯度。
+  <img alt="" src="index.assets/Data-Parallelism.png" /></li>
+</ul>
+<p>在pytorch、tensorflow等框架中都存在分布式训练的模块，为了减轻工作量，此部分也允许使用 huggingface accelerate 等模型库，以及其他的分布式训练加速框架。</p>
+<h4 id="424">4.2.4 模型评分规模</h4>
+<p>你需要按照下列表格中给定的模型结构参数实现模型，并按照要求的 token 数量对模型进行训练。规定 token 数量训练结束后，若模型损失低于 7，认为模型训练成功，此时训练速度越快该测试点得分越高；否则认为模型训练失败，记零分。</p>
+<table>
+<thead>
+<tr>
+<th align="center">Model size</th>
+<th align="center">Hidden size</th>
+<th align="center">Attention-heads</th>
+<th align="center">Layers</th>
+<th align="center">Sequence length</th>
+<th align="center">Tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">117M</td>
+<td align="center">768</td>
+<td align="center">12</td>
+<td align="center">12</td>
+<td align="center">1024</td>
+<td align="center">12M</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>PS. Model size 会因 vocab size 变化而波动，因此不会作为实现正确性的主要判断依据，我们会直接根据代码判断模型实现的正确性</p>
+</blockquote>
+<h2 id="5">5 实验任务与要求</h2>
+<ol>
+<li>使用 <code>PyTorch</code> 实现最基本的卷积神经网络 LeNet-5，并在 MNIST 数据集上使用 GPU 进行训练，并对测试集进行测试。</li>
+<li>使用 <code>PyTorch</code> 及相关模型库实现类 GPT 网络，在 Web of Science 数据集上进行训练，并尝试对模型训练进行加速。</li>
+<li>你需要提交：<ol>
+<li>全部代码</li>
+<li>实验报告，其中需要包含：<ol>
+<li>简要实验过程</li>
+<li>贴上两个模型训练过程的 <strong>GPU 占用率截图</strong>（使用 <code>nvidia-smi</code> 查看）</li>
+<li>Tensorboard <strong>两个模型的损失曲线、LeNet-5 的准确率曲线等截图</strong></li>
+<li>对于 LeNet-5，你需要写明测试集上的<strong>识别正确率</strong></li>
+<li>对于 GPT，你需要写明训练完成的时间，最后的收敛情况，以及使用的加速策略</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong><em>LeNet-5 部分不允许直接使用各种深度学习开发工具已训练好的 CNN 网络结构与参数；GPT-2 部分不允许使用任何已经训练好的模型参数</em></strong></li>
+<li><strong><em>本次实验依然会进行查重，如果你参考了网络上的代码请在报告中列出，并体现出你的理解，否则一经查出视为抄袭</em></strong></li>
+</ol>
+<h2 id="_2">参考资料</h2>
+<ul>
+<li><code>PyTorch</code> 框架 <a href="https://pytorch.org/">https://pytorch.org/</a></li>
+<li><code>PyTorch Lightning</code> 框架 <a href="https://www.pytorchlightning.ai/">https://www.pytorchlightning.ai/</a></li>
+<li>MNIST 数据集 <a href="http://yann.lecun.com/exdb/mnist/index.html">http://yann.lecun.com/exdb/mnist/index.html</a></li>
+<li>LeNet-5 网络结构 <a href="http://yann.lecun.com/exdb/lenet/">http://yann.lecun.com/exdb/lenet/</a></li>
+<li>GPT 网络介绍 <a href="https://en.wikipedia.org/wiki/GPT-2">https://en.wikipedia.org/wiki/GPT-2</a></li>
+</ul>
+
+
+
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../Lab4-Gemm/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Lab4-GEMM 通用矩阵乘法" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Lab4-GEMM 通用矩阵乘法
+            </div>
+          </div>
+        </a>
+      
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.2ab50757.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
